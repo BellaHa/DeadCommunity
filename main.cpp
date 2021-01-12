@@ -150,33 +150,8 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
 int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
-    /*runExperiment("data_7115.txt", 5, 50, 5, false, false);
-    runExperiment("data_7115.txt", 5, 50, 5, false, true);*/
-
-    /*runExperiment("data_75879.txt", 10, 100, 10, true, false);
-    runExperiment("data_75879.txt", 10, 100, 10, true, true);*/
-
-    //runExperiment("soc-pokec-relationships.txt", 1000, 10000, 1000, true, false, true);
-    // runExperiment("soc-pokec-relationships.txt", 1000, 10000, 1000, true, true, true);
-
-    /*runExperiment("soc-LiveJournal1.txt", 2000, 10000, 2000, true, false, true);
-    runExperiment("soc-LiveJournal1.txt", 2000, 10000, 2000, true, true, true);*/
-
-    /*g->readSocialGraph("data/facebook.txt");
-    g->formCommunityClauset("data/facebookCommClauset.txt");
-    g->formCommunityModularity("data/facebookCommMM.txt");
-
-    g->readSocialGraph("data/com-dblp.ungraph.txt");
-    g->formCommunityClauset("data/dblpCommClauset.txt");
-    g->formCommunityModularity("data/dblpCommMM.txt");*/
 
     runExperiment("facebookE.txt", "facebookComm.txt", 4, 10, 2, true, false, false, false, true, false);
-    // runExperiment("facebook.txt", "facebookCommGirvan.txt", 4, 10, 2, true, false, false, false, false, true, false);
-    // runExperiment("facebook.txt", "facebookCommMM.txt", 4, 10, 2, true, true, false, false, false, true, true);
-    // runExperiment("facebook.txt", "facebookCommGirvan.txt", 4, 10, 2, true, true, false, false, false, true, false);
-    // runExperiment("com-dblp.ungraph.txt", "dblpCommMM.txt", 4, 10, 2, true, false, false, false, false, true);
-
-    //runExperiment("soc-LiveJournal1.txt", "", 2000,10000,2000, true, false, true, true, true, false, false);
 
     // Generate community
     // g->generateEdgeWeight("../data/facebook.txt", "../data/facebookE.txt");
