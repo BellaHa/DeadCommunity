@@ -12,11 +12,13 @@ public:
 	void setSocialGraph(SocialGraph * g);
 
 	DCRgraph* generateDCRgraph();
+    DCRgraph* generateDCRgraphMig();
 
 private:
 	SocialGraph *g;
 
 	DCRgraph * generateDCRgraphIC();
+    DCRgraph * generateDCRgraphICMig();
 	DCRgraph * generateDCRgraphLT();
 
 	void dfs(int u, vector<int> * reachable, map<int, vector<int>> * mapNeighbors);

@@ -11,7 +11,8 @@ public:
 
 	static Common * getInstance();
 
-	unsigned nChoosek(unsigned n, unsigned k);
+    // long Common::nChoosek(long N, long K) {
+    unsigned nChoosek(unsigned n, unsigned k);
 	bool isIntersected(vector<int> * set1, vector<int> * set2); // both 2 set is sorted
 	vector<int> setDifference(vector<int> * set1, vector<int> * set2);
 	unsigned randomInThread();

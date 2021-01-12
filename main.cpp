@@ -16,6 +16,7 @@
 #include "Constant.h"
 #include <stdlib.h>
 #include <string>
+#include "GIA.h"
 
 using namespace std;
 
@@ -41,6 +42,21 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "MAF: " << remaf << endl;
     // cout << "MAF Time: " << timeMaf << endl;
 
+    GIA gia(g);
+    long startGIA = time(NULL);
+    double reGIA = 0;
+    if (isScalable)
+        gia.getSolution(&sol, &reGIA);
+    else
+        gia.getSolution2Step(&sol, &reGIA);
+    long timeGIA = time(NULL) - startGIA;
+    cout << "GIA: " << reGIA << endl;
+    cout << "GIA Time: " << timeGIA << endl;
+    for (int i = 0; i < sol.size(); ++i) {
+        cout << sol.at(i) << "   ";
+    }
+    cout << endl;
+
     SandwichSolution ubg(g);
     long startUbg = time(NULL);
     double reubg = 0;
@@ -51,6 +67,10 @@ void printResult(bool isScalable, bool isLargeFile) {
     long timeUbg = time(NULL) - startUbg;
     cout << "UBG: " << reubg << endl;
     cout << "UBG Time: " << timeUbg << endl;
+    for (int i = 0; i < sol.size(); ++i) {
+        cout << sol.at(i) << "   ";
+    }
+    cout << endl;
 
     /*CompareGreedy grd(g);
     long startGrd = time(NULL);

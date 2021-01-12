@@ -21,6 +21,8 @@ public:
 	virtual double getSolution(vector<int> * sol, double *est);
 	virtual double getSolution2Step(vector<int> * sol, double *est);
 	double estimateInf(vector<int>* sol);
+    virtual void generateDCRgraphs(int number);
+    virtual void initiate();
 protected:
 	SocialGraph * g;
 	vector<DCRgraph*> dcrSet;
@@ -36,8 +38,6 @@ protected:
 	double D, e1, e2, e3; // D - lambda, epsilon 1 2 3
 	int rMax; // maximum number of ri graph
 
-	void initiate();
-	void generateDCRgraphs(int number);
 	void clear();
 
 	bool isMaf = false;
