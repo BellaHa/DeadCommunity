@@ -11,8 +11,8 @@ public:
 	static const double PERCENTAGE_THRESHOLD;
 	static const double EPSILON;
 	static const double DELTA;
-	static const int NUM_THREAD = 64;
+	static const int NUM_THREAD = 8;
 	static bool IS_BOUNDED_THRESHOLD;
-	static const bool MODEL = true; // true : LT ; false : IC
+	static const bool MODEL = false; // true : LT ; false : IC
 };
 
