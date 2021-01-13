@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string>
 #include "GIA.h"
+#include "HighDegree.h"
 
 using namespace std;
 
@@ -42,34 +43,47 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "MAF: " << remaf << endl;
     // cout << "MAF Time: " << timeMaf << endl;
 
-    GIA gia(g);
-    long startGIA = time(NULL);
-    double reGIA = 0;
-    if (isScalable)
-        gia.getSolution(&sol, &reGIA);
-    else
-        gia.getSolution2Step(&sol, &reGIA);
-    long timeGIA = time(NULL) - startGIA;
-    cout << "GIA: " << reGIA << endl;
-    cout << "GIA Time: " << timeGIA << endl;
-    cout << sol.size() << endl;
-    // for (int i = 0; i < sol.size(); ++i) {
-    //     cout << sol.at(i) << "   ";
-    // }
-    // cout << endl;
+    // HighDegree hd(g);
+    // long startHD = time(NULL);
+    // double reHD = 0;
+    // if (isScalable)
+    //     hd.getSolution(&sol, &reHD);
+    // else
+    //     hd.getSolution2Step(&sol, &reHD);
+    // long timeHD = time(NULL) - startHD;
+    // cout << "HD: " << reHD << endl;
+    // cout << "HD Time: " << timeHD << endl;
+    // cout << sol.size() << endl;
+    // return;
 
-    Constant::K = sol.size();
-
-    SandwichSolution ubg(g);
-    long startUbg = time(NULL);
-    double reubg = 0;
-    if (isScalable)
-        ubg.getSolution(&sol, &reubg);
-    else
-        ubg.getSolution2Step(&sol, &reubg);
-    long timeUbg = time(NULL) - startUbg;
-    cout << "UBG: " << reubg << endl;
-    cout << "UBG Time: " << timeUbg << endl;
+    // GIA gia(g);
+    // long startGIA = time(NULL);
+    // double reGIA = 0;
+    // if (isScalable)
+    //     gia.getSolution(&sol, &reGIA);
+    // else
+    //     gia.getSolution2Step(&sol, &reGIA);
+    // long timeGIA = time(NULL) - startGIA;
+    // cout << "GIA: " << reGIA << endl;
+    // cout << "GIA Time: " << timeGIA << endl;
+    // cout << sol.size() << endl;
+    // // for (int i = 0; i < sol.size(); ++i) {
+    // //     cout << sol.at(i) << "   ";
+    // // }
+    // // cout << endl;
+    //
+    // Constant::K = sol.size();
+    //
+    // SandwichSolution ubg(g);
+    // long startUbg = time(NULL);
+    // double reubg = 0;
+    // if (isScalable)
+    //     ubg.getSolution(&sol, &reubg);
+    // else
+    //     ubg.getSolution2Step(&sol, &reubg);
+    // long timeUbg = time(NULL) - startUbg;
+    // cout << "UBG: " << reubg << endl;
+    // cout << "UBG Time: " << timeUbg << endl;
     // for (int i = 0; i < sol.size(); ++i) {
     //     cout << sol.at(i) << "   ";
     // }
@@ -97,12 +111,12 @@ void printResult(bool isScalable, bool isLargeFile) {
     //     timeBt = time(NULL) - startBt;
     // }
     //
-    // SSA ssa(g);
-    // double reSSA = 0;
-    // long startSSA = time(NULL);
-    // ssa.getSolution(&sol, &reSSA);
-    // long timeSSA = time(NULL) - startSSA;
-    // cout << "SSA: " << reSSA << endl;
+    SSA ssa(g);
+    double reSSA = 0;
+    long startSSA = time(NULL);
+    ssa.getSolution(&sol, &reSSA);
+    long timeSSA = time(NULL) - startSSA;
+    cout << "SSA: " << reSSA << endl;
     //
     // HighBenefit hb(g);
     // long startHB = time(NULL);
