@@ -172,6 +172,9 @@ int main() {
     omp_set_num_threads(Constant::NUM_THREAD);
 
     runExperiment("facebookE.txt", "facebookComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    runExperiment("epinionsE.txt", "epinionsComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    runExperiment("dblpE.txt", "dblpComm.txt", 4, 10, 2, true, false, false, false, true, false);
 
     // Generate community
     // g->generateEdgeWeight("../data/facebook.txt", "../data/facebookE.txt");

@@ -38,8 +38,7 @@ Common *Common::getInstance() {
 // }
 
 unsigned Common::nChoosek(unsigned n, unsigned k) {
-    if (k > n)
-        return 0;
+    if (k > n) return 0;
     unsigned r = 1;
     for (int d = 1; d <= k; d++) {
         r *= n--;
@@ -87,4 +86,3 @@ unsigned Common::randomInThread() {
     seed[omp_get_thread_num() % 100] = tmp;
     return tmp;
 }
-
