@@ -6,7 +6,7 @@ class GIA : public Algorithm {
 public:
     double nMax;
     double n1;
-    double iMax;
+    int iMax;
     double delta1;
     double c;
 

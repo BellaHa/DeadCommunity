@@ -39,14 +39,6 @@ Common *Common::getInstance() {
 
 unsigned Common::nChoosek(unsigned n, unsigned k) {
     if (k > n) return 0;
-    unsigned r = 1;
-    for (int d = 1; d <= k; d++) {
-        r *= n--;
-        r /= d;
-    }
-    return r;
-
-    if (k > n) return 0;
     if (k == 0) return 1;
     unsigned re = n;
     for (int i = 2; i <= k; i++) {
@@ -85,4 +77,22 @@ unsigned Common::randomInThread() {
     tmp = tmp * 17931 + 7391;
     seed[omp_get_thread_num() % 100] = tmp;
     return tmp;
+}
+
+double Common::lognCk(unsigned int n, unsigned int k) {
+    // double _n = 0, _k = 0, n_k = 0;
+    // for (int i = 1; i <= n; i++) _n += log(1.0 * i); // n!
+    // for (int i = 1; i <= k; i++) _k += log(1.0 * i); // k!
+    // for (int i = 1; i <= n - k; i++) n_k += log(1.0 * i); // n-k!
+    // return _n - _k - n_k;
+
+    if (k > n) return 0.;
+    if (k == 0) return 1.;
+    double up = 0., down = 0.;
+    for (int d = 1; d <= k; d++) {
+        up += log(1. * n);
+        n--;
+        down += log(1. * d);
+    }
+    return up - down;
 }

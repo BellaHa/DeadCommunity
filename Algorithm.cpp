@@ -120,23 +120,31 @@ void Algorithm::initiate() {
     double ep1 = Constant::EPSILON - 0.081;
     double ep2 = Constant::EPSILON - ep1;
     int nChoosek = Common::getInstance()->nChoosek(g->getNumberOfNodes(), Constant::K);
+    double lognCk = Common::getInstance()->lognCk(g->getNumberOfNodes(), Constant::K);
     /*double d1 = (double)nChoosek / (nChoosek + 1) * Constant::DELTA;
     double d2 = Constant::DELTA - d1;*/
     double d1 = Constant::DELTA - 0.01;
     double d2 = Constant::DELTA - d1;
     int hMax = g->getMaxThreshold();
 
-    double tmp1 = log((double) nChoosek / d1) / (ep1 * ep1);
-    double tmp2 = 2 * log(1.0 / d2) / (ep2 * ep2);
+    // double tmp1 = log((double) nChoosek / d1) / (ep1 * ep1);
+    // double tmp2 = 2 * log(1.0 / d2) / (ep2 * ep2);
 
     if (!Constant::IS_WEIGHTED) {
         int t = g->getNumberOfCommunities();
-        rMax = ceil(hMax * t / Constant::K * max(3 * log((double) nChoosek / d1) / (ep1 * ep1),
+        int rMax1 = ceil(hMax * t / Constant::K * max(3 * log((double) nChoosek / d1) / (ep1 * ep1),
+                                                      2 * log(1.0 / d2) /
+                                                      (ep2 * ep2))); // maximum number of DCR graph
+        rMax = ceil(hMax * t / Constant::K * max(3 * (lognCk - log(d1)) / (ep1 * ep1),
                                                  2 * log(1.0 / d2) / (ep2 * ep2))); // maximum number of DCR graph
+        cout << "pause" << endl;
     } else {
         int t = g->getNumberOfNodes();
         int bMin = g->getMinBenefit();
-        rMax = ceil(hMax * t / (Constant::K * bMin) * max(3 * log((double) nChoosek / d1) / (ep1 * ep1),
+        // rMax = ceil(hMax * t / (Constant::K * bMin) * max(3 * log((double) nChoosek / d1) / (ep1 * ep1),
+        //                                                   2 * log(1.0 / d2) /
+        //                                                   (ep2 * ep2))); // maximum number of DCR graph
+        rMax = ceil(hMax * t / (Constant::K * bMin) * max(3 * (lognCk - log(d1)) / (ep1 * ep1),
                                                           2 * log(1.0 / d2) /
                                                           (ep2 * ep2))); // maximum number of DCR graph
     }

@@ -57,20 +57,20 @@ void printResult(bool isScalable, bool isLargeFile) {
     }
     cout << endl;
 
-    SandwichSolution ubg(g);
-    long startUbg = time(NULL);
-    double reubg = 0;
-    if (isScalable)
-        ubg.getSolution(&sol, &reubg);
-    else
-        ubg.getSolution2Step(&sol, &reubg);
-    long timeUbg = time(NULL) - startUbg;
-    cout << "UBG: " << reubg << endl;
-    cout << "UBG Time: " << timeUbg << endl;
-    for (int i = 0; i < sol.size(); ++i) {
-        cout << sol.at(i) << "   ";
-    }
-    cout << endl;
+    // SandwichSolution ubg(g);
+    // long startUbg = time(NULL);
+    // double reubg = 0;
+    // if (isScalable)
+    //     ubg.getSolution(&sol, &reubg);
+    // else
+    //     ubg.getSolution2Step(&sol, &reubg);
+    // long timeUbg = time(NULL) - startUbg;
+    // cout << "UBG: " << reubg << endl;
+    // cout << "UBG Time: " << timeUbg << endl;
+    // for (int i = 0; i < sol.size(); ++i) {
+    //     cout << sol.at(i) << "   ";
+    // }
+    // cout << endl;
 
     /*CompareGreedy grd(g);
     long startGrd = time(NULL);
