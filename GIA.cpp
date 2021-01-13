@@ -230,7 +230,7 @@ void GIA::initiate() {
     double delta = Constant::DELTA;
     int n = g->getNumberOfNodes();
     int kMax = n / 2;
-    int nChoosek = Common::getInstance()->nChoosek(n, kMax);
+    unsigned int nChoosek = Common::getInstance()->nChoosek(3, 2);
     nMax = (2. + (2. / 3.) * epsilon) * ((double) n / pow(epsilon, 2)) * log((2. * nChoosek) / delta);
 
     vector<int> *nodeIds = g->getListNodeIds();

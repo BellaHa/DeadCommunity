@@ -1,23 +1,28 @@
 #pragma once
+
 #include <vector>
 #include <omp.h>
+
 using namespace std;
 
-class Common
-{
+class Common {
 public:
-	Common();
-	~Common();
+    Common();
 
-	static Common * getInstance();
+    ~Common();
+
+    static Common *getInstance();
 
     // long Common::nChoosek(long N, long K) {
-    unsigned nChoosek(unsigned n, unsigned k);
-	bool isIntersected(vector<int> * set1, vector<int> * set2); // both 2 set is sorted
-	vector<int> setDifference(vector<int> * set1, vector<int> * set2);
-	unsigned randomInThread();
+    unsigned int nChoosek(unsigned int n, unsigned int k);
+
+    bool isIntersected(vector<int> *set1, vector<int> *set2); // both 2 set is sorted
+    vector<int> setDifference(vector<int> *set1, vector<int> *set2);
+
+    unsigned randomInThread();
+
 private:
-	static Common * instance;
-	int * seed;
+    static Common *instance;
+    int *seed;
 };
 
