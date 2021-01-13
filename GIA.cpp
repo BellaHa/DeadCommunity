@@ -37,7 +37,7 @@ double GIA::getDeterministicSolution(vector<int> *sol) {
     MappedHeap<InfCost<double>> heap(indx, hd);
 
     double gain = 0.0;
-    while (sol->size() < Constant::K) {
+    while (gain / dcrSet.size() < 1) {
         unsigned int maxInd = heap.pop();
         double maxGain = marginalGain[maxInd];
         gain += maxGain;
@@ -132,28 +132,43 @@ double GIA::getSolution(vector<int> *sol, double *est) {
     sol->clear();
     initiate();
     omp_set_num_threads(Constant::NUM_THREAD);
-    generateDCRgraphs((int) D);
+    generateDCRgraphs((int) n1);
 
-    while (dcrSet.size() < rMax) {
-        double re = getDeterministicSolution(sol);
-        int tmp = dcrSet.size();
+    double re = 0.;
+    for (int i = 0; i < iMax; ++i) {
+        re = getDeterministicSolution(sol);
         *est = estimateInf(sol);
-        if (dcrSet.size() * (*est) / (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) >=
-            D) {
-            double re2 = estimate(sol, e2, Constant::DELTA / 3, dcrSet.size());
-            cout << re << " " << re2 << " " << time(NULL) << endl;
-            if (re <= (1 + e1) * re2)
-                return (*est) / re;
+        double epsilon = Constant::EPSILON;
+        double K = (double) g->getNumberOfCommunities();
+        if (*est >= (K - epsilon * K) || i == iMax - 1) {
+            break;
+        } else {
+            generateDCRgraphs(dcrSet.size());
         }
-
-        int tmp2 = dcrSet.size();
-        generateDCRgraphs(2 * tmp - tmp2);
-
     }
-    double re = getDeterministicSolution(sol);
-    *est = estimateInf(sol);
     clear();
-    return (*est) / re;
+    return *est / re;
+
+    // while (dcrSet.size() < rMax) {
+    //     double re = getDeterministicSolution(sol);
+    //     int tmp = dcrSet.size();
+    //     *est = estimateInf(sol);
+    //     if (dcrSet.size() * (*est) / (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) >=
+    //         D) {
+    //         double re2 = estimate(sol, e2, Constant::DELTA / 3, dcrSet.size());
+    //         cout << re << " " << re2 << " " << time(NULL) << endl;
+    //         if (re <= (1 + e1) * re2)
+    //             return (*est) / re;
+    //     }
+    //
+    //     int tmp2 = dcrSet.size();
+    //     generateDCRgraphs(2 * tmp - tmp2);
+    //
+    // }
+    // double re = getDeterministicSolution(sol);
+    // *est = estimateInf(sol);
+    // clear();
+    // return (*est) / re;
 }
 
 double GIA::getSolution2Step(vector<int> *sol, double *est) {
@@ -244,4 +259,27 @@ void GIA::initiate() {
         indx[i] = i;
         mapNodeIdx.insert(pair<int, int>(u, i));
     }
+}
+
+double GIA::estimateInf(vector<int> *sol) {
+    double K = (double) g->getNumberOfCommunities();
+    double T = (double) dcrSet.size();
+    double nb1 = K - ((K * c) / (3. * T));
+
+    double Xsol = 0.;
+#pragma omp parallel for
+    for (int i = 0; i < dcrSet.size(); i++) {
+        bool kill = dcrSet[i]->isKill(sol);
+
+        if (kill) {
+#pragma omp critical
+            {
+                Xsol += 1.0;
+            }
+        }
+    }
+
+    double eSigma = (K / T) * Xsol;
+    double nb2 = K + (K / T) * ((2. * c / 3) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
+    return min(nb1, nb2);
 }

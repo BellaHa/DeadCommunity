@@ -52,35 +52,38 @@ void printResult(bool isScalable, bool isLargeFile) {
     long timeGIA = time(NULL) - startGIA;
     cout << "GIA: " << reGIA << endl;
     cout << "GIA Time: " << timeGIA << endl;
-    for (int i = 0; i < sol.size(); ++i) {
-        cout << sol.at(i) << "   ";
-    }
-    cout << endl;
-
-    // SandwichSolution ubg(g);
-    // long startUbg = time(NULL);
-    // double reubg = 0;
-    // if (isScalable)
-    //     ubg.getSolution(&sol, &reubg);
-    // else
-    //     ubg.getSolution2Step(&sol, &reubg);
-    // long timeUbg = time(NULL) - startUbg;
-    // cout << "UBG: " << reubg << endl;
-    // cout << "UBG Time: " << timeUbg << endl;
+    cout << sol.size() << endl;
     // for (int i = 0; i < sol.size(); ++i) {
     //     cout << sol.at(i) << "   ";
     // }
     // cout << endl;
 
-    /*CompareGreedy grd(g);
-    long startGrd = time(NULL);
-    double reGrd = 0;
-    if (isScalable)
-    grd.getSolution(&sol, &reGrd);
-    else
-    grd.getSolution2Step(&sol, &reGrd);
-    long timeGrd = time(NULL) - startGrd;*/
+    Constant::K = sol.size();
 
+    SandwichSolution ubg(g);
+    long startUbg = time(NULL);
+    double reubg = 0;
+    if (isScalable)
+        ubg.getSolution(&sol, &reubg);
+    else
+        ubg.getSolution2Step(&sol, &reubg);
+    long timeUbg = time(NULL) - startUbg;
+    cout << "UBG: " << reubg << endl;
+    cout << "UBG Time: " << timeUbg << endl;
+    // for (int i = 0; i < sol.size(); ++i) {
+    //     cout << sol.at(i) << "   ";
+    // }
+    // cout << endl;
+    //
+    // CompareGreedy grd(g);
+    // long startGrd = time(NULL);
+    // double reGrd = 0;
+    // if (isScalable)
+    // grd.getSolution(&sol, &reGrd);
+    // else
+    // grd.getSolution2Step(&sol, &reGrd);
+    // long timeGrd = time(NULL) - startGrd;
+    //
     // long timeBt = 0;
     // double reBt = 0;
     // if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile) {
@@ -172,9 +175,9 @@ int main() {
     omp_set_num_threads(Constant::NUM_THREAD);
 
     runExperiment("facebookE.txt", "facebookComm.txt", 4, 10, 2, true, false, false, false, true, false);
-    runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
-    runExperiment("epinionsE.txt", "epinionsComm.txt", 4, 10, 2, true, false, false, false, true, false);
-    runExperiment("dblpE.txt", "dblpComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    // runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    // runExperiment("epinionsE.txt", "epinionsComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    // runExperiment("dblpE.txt", "dblpComm.txt", 4, 10, 2, true, false, false, false, true, false);
 
     // Generate community
     // g->generateEdgeWeight("../data/facebook.txt", "../data/facebookE.txt");

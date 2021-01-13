@@ -63,6 +63,8 @@ private:
     vector<vector<int> > listCommListNodeIds; // comm id -> list of node ids in community, dont need map because comm id in txt file in order from 0
     vector<vector<int>> actualCommNodeIds; // actual communities from community detection alg
     map<int, vector<std::pair<int, double> > > mapIncommingNeighbors; // id -> list of incomming neighbor id and weight of edge
+    map<int, vector<std::pair<int, double> > > mapOutgoingNeighbors; // id -> list of incomming neighbor id and weight of edge
+    vector<int> outgoingDegree;
     int hMax = 0; // maximum threshold of one community
     int bMin = 1000; // size of the smallest community
     void clear();

@@ -83,6 +83,13 @@ void SocialGraph::readSocialGraph(string inputFile, bool isDirected) {
                 tmp.emplace_back(startNode, weight);
                 mapIncommingNeighbors.insert(pair<int, vector<pair<int, double>>>(endNode, tmp));
             }
+            if (mapOutgoingNeighbors.find(startNode) != mapOutgoingNeighbors.end()) {
+                mapOutgoingNeighbors[startNode].push_back(pair<int, double>(endNode, weight));
+            } else {
+                vector<pair<int, double>> tmp;
+                tmp.emplace_back(endNode, weight);
+                mapOutgoingNeighbors.insert(pair<int, vector<pair<int, double>>>(startNode, tmp));
+            }
             if (find(listNodeIds.begin(), listNodeIds.end(), startNode) == listNodeIds.end())
                 listNodeIds.push_back(startNode);
 
@@ -90,6 +97,11 @@ void SocialGraph::readSocialGraph(string inputFile, bool isDirected) {
                 listNodeIds.push_back(endNode);
             noOfEdges++;
         }
+        outgoingDegree.clear();
+        for (int i = 0; i < getNumberOfNodes(); ++i) {
+            outgoingDegree.emplace_back(mapOutgoingNeighbors[listNodeIds[i]].size());
+        }
+        file.close();
         // int startId, endId;
         // int count = 0;
         // while (file >> startId >> endId) {

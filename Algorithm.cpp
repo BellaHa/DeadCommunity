@@ -137,7 +137,6 @@ void Algorithm::initiate() {
                                                       (ep2 * ep2))); // maximum number of DCR graph
         rMax = ceil(hMax * t / Constant::K * max(3 * (lognCk - log(d1)) / (ep1 * ep1),
                                                  2 * log(1.0 / d2) / (ep2 * ep2))); // maximum number of DCR graph
-        cout << "pause" << endl;
     } else {
         int t = g->getNumberOfNodes();
         int bMin = g->getMinBenefit();
