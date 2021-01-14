@@ -5,6 +5,10 @@
 #include <string>
 #include <time.h>
 #include "Algorithm.h"
+#include "sstream"
+#include <process.h>
+#include "mappedheap.hpp"
+#include "HeapData.hpp"
 
 class SSA : public Algorithm {
 public:
@@ -18,6 +22,13 @@ public:
     double getDeterministicSolution(vector<int> *sol);
 
     double getSolution(vector<int> *sol, double *est);
+
+
+    string intToStr(int i);
+
+    unsigned int strToInt(string s);
+
+    float getCurrentMemoryUsage();
 
 private:
     string graphSSAformat;
