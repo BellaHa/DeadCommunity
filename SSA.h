@@ -5,7 +5,6 @@
 #include <string>
 #include <time.h>
 #include "Algorithm.h"
-#include "hypergraph.h"
 
 class SSA : public Algorithm {
 public:
@@ -19,10 +18,6 @@ public:
     double getDeterministicSolution(vector<int> *sol);
 
     double getSolution(vector<int> *sol, double *est);
-
-    bool
-    calculateInfluence(HyperGraph &hg, Graph &g, vector<int> &seeds, int t, double &deg, float epsilon, float delta,
-                       int m, long long int maxSamples, int iter);
 
 private:
     string graphSSAformat;
