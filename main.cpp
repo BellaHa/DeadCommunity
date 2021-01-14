@@ -110,13 +110,14 @@ void printResult(bool isScalable, bool isLargeFile) {
     //         bt.getSolution2Step(&sol, &reBt);
     //     timeBt = time(NULL) - startBt;
     // }
-    //
+
     SSA ssa(g);
     double reSSA = 0;
     long startSSA = time(NULL);
     ssa.getSolution(&sol, &reSSA);
     long timeSSA = time(NULL) - startSSA;
     cout << "SSA: " << reSSA << endl;
+    cout << "SSA Time: " << timeSSA << endl;
     //
     // HighBenefit hb(g);
     // long startHB = time(NULL);
