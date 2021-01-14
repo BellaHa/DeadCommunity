@@ -3,5 +3,5 @@ cmake-build-debug
 cmake-build-release/*
 !cmake-build-release/*.bat
 *.o
-cmake-build-release-1
+tmp
 data

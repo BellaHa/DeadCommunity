@@ -14,7 +14,6 @@ class Algorithm {
 public:
     Algorithm(SocialGraph *g);
 
-
     Algorithm();
 
     ~Algorithm();
