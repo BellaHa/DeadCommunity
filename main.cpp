@@ -31,17 +31,6 @@ ofstream writefile;
 void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
     sol.clear();
-    // GreedySolution maf(g);
-    // long startMaf = time(NULL);
-    // double remaf = 0;
-    // if (isScalable)
-    //     maf.getSolution(&sol, &remaf);
-    // else
-    //     maf.getSolution2Step(&sol, &remaf);
-    // long timeMaf = time(NULL) - startMaf;
-    //
-    // cout << "MAF: " << remaf << endl;
-    // cout << "MAF Time: " << timeMaf << endl;
 
     // HighDegree hd(g);
     // long startHD = time(NULL);
@@ -54,8 +43,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "HD: " << reHD << endl;
     // cout << "HD Time: " << timeHD << endl;
     // cout << sol.size() << endl;
-    // return;
-
+    //
     // GIA gia(g);
     // long startGIA = time(NULL);
     // double reGIA = 0;
@@ -67,10 +55,6 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "GIA: " << reGIA << endl;
     // cout << "GIA Time: " << timeGIA << endl;
     // cout << sol.size() << endl;
-    // // for (int i = 0; i < sol.size(); ++i) {
-    // //     cout << sol.at(i) << "   ";
-    // // }
-    // // cout << endl;
     //
     // Constant::K = sol.size();
     //
@@ -84,10 +68,26 @@ void printResult(bool isScalable, bool isLargeFile) {
     // long timeUbg = time(NULL) - startUbg;
     // cout << "UBG: " << reubg << endl;
     // cout << "UBG Time: " << timeUbg << endl;
-    // for (int i = 0; i < sol.size(); ++i) {
-    //     cout << sol.at(i) << "   ";
-    // }
-    // cout << endl;
+
+    SSA ssa(g);
+    double reSSA = 0;
+    long startSSA = time(NULL);
+    ssa.getSolution(&sol, &reSSA);
+    long timeSSA = time(NULL) - startSSA;
+    cout << "SSA: " << reSSA << endl;
+
+    // GreedySolution maf(g);
+    // long startMaf = time(NULL);
+    // double remaf = 0;
+    // if (isScalable)
+    //     maf.getSolution(&sol, &remaf);
+    // else
+    //     maf.getSolution2Step(&sol, &remaf);
+    // long timeMaf = time(NULL) - startMaf;
+    //
+    // cout << "MAF: " << remaf << endl;
+    // cout << "MAF Time: " << timeMaf << endl;
+
     //
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
@@ -111,12 +111,6 @@ void printResult(bool isScalable, bool isLargeFile) {
     //     timeBt = time(NULL) - startBt;
     // }
     //
-    SSA ssa(g);
-    double reSSA = 0;
-    long startSSA = time(NULL);
-    ssa.getSolution(&sol, &reSSA);
-    long timeSSA = time(NULL) - startSSA;
-    cout << "SSA: " << reSSA << endl;
     //
     // HighBenefit hb(g);
     // long startHB = time(NULL);
