@@ -111,7 +111,6 @@ void printResult(bool isScalable, bool isLargeFile) {
     //     timeBt = time(NULL) - startBt;
     // }
     //
-    //
     // HighBenefit hb(g);
     // long startHB = time(NULL);
     // double reHb = 0;
