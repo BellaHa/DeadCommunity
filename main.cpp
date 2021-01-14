@@ -75,6 +75,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     ssa.getSolution(&sol, &reSSA);
     long timeSSA = time(NULL) - startSSA;
     cout << "SSA: " << reSSA << endl;
+    cout << "SSA Time: " << timeSSA << endl;
 
     // GreedySolution maf(g);
     // long startMaf = time(NULL);
