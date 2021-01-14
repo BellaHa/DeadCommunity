@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(DeadCommunity)
+project(DSSA)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -39,8 +39,9 @@ set(CPLEXLIBS ilocplex concert cplex12100 cp)
 # END CPLEX
 
 include_directories(.)
+include_directories(sfmt)
 
-file(GLOB SOURCES *.cpp)
+file(GLOB SOURCES *.cpp sfmt/SFMT.c)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CPLEXLIBS})
