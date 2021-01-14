@@ -27,6 +27,8 @@ using namespace std;
 
 SocialGraph *g;
 ofstream writefile;
+string graphBinFile;
+string seedFile;
 
 void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
@@ -114,6 +116,8 @@ void printResult(bool isScalable, bool isLargeFile) {
     SSA ssa(g);
     double reSSA = 0;
     long startSSA = time(NULL);
+    ssa.graphBinFile = graphBinFile;
+    ssa.seedFile = seedFile;
     ssa.getSolution(&sol, &reSSA);
     long timeSSA = time(NULL) - startSSA;
     cout << "SSA: " << reSSA << endl;
@@ -189,7 +193,17 @@ int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
 
-    runExperiment("facebookE.txt", "facebookComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    string dir = "../data/";
+    vector<string> graphs{"facebook"};
+    // vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
+    for (int i = 0; i < graphs.size(); ++i) {
+        string graph = graphs[i];
+        graphBinFile = "D:/DeadCommunity/data/" + graph + "SSA.bin";
+        seedFile = "D:/DeadCommunity/data/" + graph + ".seeds";
+        string input = dir + graph + "E.txt";
+        string inputCommunity = dir + graph + "Comm.txt";
+        runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
+    }
     // runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
     // runExperiment("epinionsE.txt", "epinionsComm.txt", 4, 10, 2, true, false, false, false, true, false);
     // runExperiment("dblpE.txt", "dblpComm.txt", 4, 10, 2, true, false, false, false, true, false);

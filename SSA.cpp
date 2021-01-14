@@ -6,13 +6,13 @@
 SSA::SSA(SocialGraph * g) : Algorithm(g)
 {
 	graphSSAformat = "graphSSA.txt";
-	g->generateFileIM(graphSSAformat);
+	// g->generateFileIM(graphSSAformat);
 	graphBinFile = "graphSSA.bin";
-
-	string tmp = " ../SSA_release_2.0/DSSA/el2bin " + graphSSAformat + " " + graphBinFile;
-	formatCmd = tmp.c_str();
-	system(formatCmd);
-
+    //
+	// string tmp = " ../SSA_release_2.0/DSSA/el2bin " + graphSSAformat + " " + graphBinFile;
+	// formatCmd = tmp.c_str();
+	// system(formatCmd);
+    //
 	seedFile = "ssa.seeds";
 }
 
@@ -30,10 +30,11 @@ double SSA::getSolution(vector<int>* sol, double * est)
 	sol->clear();
 	initiate();
 	
-	string tmp2 = "../SSA_release_2.0/DSSA/DSSA -i " + graphBinFile + " -o "
+	string tmp2 = "D:/DSSA/cmake-build-release/DSSA -i " + graphBinFile + " -o "
 		+ seedFile + " -k " + to_string(Constant::K) + " -epsilon "
 		+ to_string(Constant::EPSILON) + " -delta " + to_string(Constant::DELTA);
 	const char * runSSAcmd = tmp2.c_str();
+	cout << runSSAcmd << endl;
 	system(runSSAcmd);
 
 	ifstream inputFile;

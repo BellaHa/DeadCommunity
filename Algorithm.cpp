@@ -28,23 +28,31 @@ double Algorithm::estimate(vector<int> *sol, double epsilon, double delta, int t
 
     int T = 0, inf = 0;
 
+    int countPerIterator = 10000;
+    int lm = tMax / countPerIterator;
+    bool b = true;
+    for (int i = 0; i < lm; ++i) {
+        b = true;
 #pragma omp parallel for
-    for (int i = 0; i < tMax; i++) {
-        DCRgraph *g = gen.generateDCRgraph();
-        bool kill = g->isKill(sol);
+        for (int j = 0; j < countPerIterator; j++) {
+            DCRgraph *g = gen.generateDCRgraph();
+            bool kill = g->isKill(sol);
 
 #pragma omp critical
-        {
-            dcrSet.push_back(g);
-            g->updateInitalGain(&intialGain, &initialDead);
-            if (tMax > 0) {
-                T++;
-                if (kill) inf++;
-                if (inf >= lambda) {
-                    tMax = -1;
+            {
+                // dcrSet.push_back(g);
+                // g->updateInitalGain(&intialGain, &initialDead);
+                if (b) {
+                    T++;
+                    cout << T << endl;
+                    if (kill) inf++;
+                    if (inf >= lambda) {
+                        b = false;
+                    }
                 }
             }
         }
+        if (!b) break;
     }
 
     /*
@@ -55,8 +63,8 @@ double Algorithm::estimate(vector<int> *sol, double epsilon, double delta, int t
             inf++;
         }
     }*/
-
-    return (tMax == -1 ? (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) * lambda / T
+    cout << "end" << endl;
+    return (!b ? (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) * lambda / T
                        : -1);
 }
 
