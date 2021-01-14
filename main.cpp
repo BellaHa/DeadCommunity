@@ -33,17 +33,17 @@ string seedFile;
 void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
     sol.clear();
-    // GreedySolution maf(g);
-    // long startMaf = time(NULL);
-    // double remaf = 0;
-    // if (isScalable)
-    //     maf.getSolution(&sol, &remaf);
-    // else
-    //     maf.getSolution2Step(&sol, &remaf);
-    // long timeMaf = time(NULL) - startMaf;
-    //
-    // cout << "MAF: " << remaf << endl;
-    // cout << "MAF Time: " << timeMaf << endl;
+    GreedySolution maf(g);
+    long startMaf = time(NULL);
+    double remaf = 0;
+    if (isScalable)
+        maf.getSolution(&sol, &remaf);
+    else
+        maf.getSolution2Step(&sol, &remaf);
+    long timeMaf = time(NULL) - startMaf;
+
+    cout << "MAF: " << remaf << endl;
+    cout << "MAF Time: " << timeMaf << endl;
 
     // HighDegree hd(g);
     // long startHD = time(NULL);
@@ -113,15 +113,15 @@ void printResult(bool isScalable, bool isLargeFile) {
     //     timeBt = time(NULL) - startBt;
     // }
 
-    SSA ssa(g);
-    double reSSA = 0;
-    long startSSA = time(NULL);
-    ssa.graphBinFile = graphBinFile;
-    ssa.seedFile = seedFile;
-    ssa.getSolution(&sol, &reSSA);
-    long timeSSA = time(NULL) - startSSA;
-    cout << "SSA: " << reSSA << endl;
-    cout << "SSA Time: " << timeSSA << endl;
+    // SSA ssa(g);
+    // double reSSA = 0;
+    // long startSSA = time(NULL);
+    // ssa.graphBinFile = graphBinFile;
+    // ssa.seedFile = seedFile;
+    // ssa.getSolution(&sol, &reSSA);
+    // long timeSSA = time(NULL) - startSSA;
+    // cout << "SSA: " << reSSA << endl;
+    // cout << "SSA Time: " << timeSSA << endl;
     //
     // HighBenefit hb(g);
     // long startHB = time(NULL);

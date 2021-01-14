@@ -35,7 +35,8 @@ double Algorithm::estimate(vector<int> *sol, double epsilon, double delta, int t
         b = true;
 #pragma omp parallel for
         for (int j = 0; j < countPerIterator; j++) {
-            DCRgraph *g = gen.generateDCRgraph();
+            DCRgraph *g = gen.generateDCRgraphMig();
+            // DCRgraph *g = gen.generateDCRgraph();
             bool kill = g->isKill(sol);
 
 #pragma omp critical
@@ -44,7 +45,7 @@ double Algorithm::estimate(vector<int> *sol, double epsilon, double delta, int t
                 // g->updateInitalGain(&intialGain, &initialDead);
                 if (b) {
                     T++;
-                    cout << T << endl;
+                    // cout << T << endl;
                     if (kill) inf++;
                     if (inf >= lambda) {
                         b = false;
@@ -63,9 +64,7 @@ double Algorithm::estimate(vector<int> *sol, double epsilon, double delta, int t
             inf++;
         }
     }*/
-    cout << "end" << endl;
-    return (!b ? (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) * lambda / T
-                       : -1);
+    return (!b ? (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) * lambda / T : -1);
 }
 
 double Algorithm::getSolution(vector<int> *sol, double *est) {
