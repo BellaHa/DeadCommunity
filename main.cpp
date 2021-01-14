@@ -27,6 +27,8 @@ using namespace std;
 
 SocialGraph *g;
 ofstream writefile;
+string graphBinFile;
+string seedFile;
 
 void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
@@ -71,6 +73,8 @@ void printResult(bool isScalable, bool isLargeFile) {
 
     SSA ssa(g);
     double reSSA = 0;
+    ssa.graphBinFile = graphBinFile;
+    ssa.seedFile = seedFile;
     long startSSA = time(NULL);
     ssa.getSolution(&sol, &reSSA);
     long timeSSA = time(NULL) - startSSA;
@@ -182,7 +186,16 @@ int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
 
-    runExperiment("facebookE.txt", "facebookComm.txt", 4, 10, 2, true, false, false, false, true, false);
+    vector<string> graphs{"facebook"};
+    // vector<string> graphs{"facebook", "wiki","epinions", "dblp","pokec"};
+    for (int i = 0; i < graphs.size(); ++i) {
+        string graph = graphs[i];
+        graphBinFile = graph + "SSA.bin";
+        seedFile = graph + ".seeds";
+        string input = graph + "E.txt";
+        string inputCommunity = graph + "Comm.txt";
+        runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
+    }
     // runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
     // runExperiment("epinionsE.txt", "epinionsComm.txt", 4, 10, 2, true, false, false, false, true, false);
     // runExperiment("dblpE.txt", "dblpComm.txt", 4, 10, 2, true, false, false, false, true, false);
@@ -190,22 +203,27 @@ int main() {
     // Generate community
     // g->generateEdgeWeight("../data/facebook.txt", "../data/facebookE.txt");
     // g->readSocialGraph("../data/facebookE.txt", true);
+    // g->generateFileIM("../data/facebookSSA.txt");
     // g->formCommunityModularity("../data/facebookComm.txt", "../data/facebook.adj", false);
     //
     // g->generateEdgeWeight("../data/wiki.txt", "../data/wikiE.txt");
     // g->readSocialGraph("../data/wikiE.txt", true);
+    // g->generateFileIM("../data/wikiSSA.txt");
     // g->formCommunityModularity("../data/wikiComm.txt", "../data/wiki.adj", false);
     //
     // g->generateEdgeWeight("../data/epinions.txt", "../data/epinionsE.txt");
     // g->readSocialGraph("../data/epinionsE.txt", true);
+    // g->generateFileIM("../data/epinionsSSA.txt");
     // g->formCommunityModularity("../data/epinionsComm.txt", "../data/epinions.adj", false);
     //
     // g->generateEdgeWeight("../data/dblp.txt", "../data/dblpE.txt");
     // g->readSocialGraph("../data/dblpE.txt", true);
+    // g->generateFileIM("../data/dblpSSA.txt");
     // g->formCommunityModularity("../data/dblpComm.txt", "../data/dblp.adj", false);
 
     // g->generateEdgeWeight("../data/pokec.txt", "../data/pokecE.txt");
     // g->readSocialGraph("../data/pokecE.txt", true);
+    // g->generateFileIM("../data/pokecSSA.txt");
     // g->formCommunityModularity("../data/pokecComm.txt", "../data/pokec.adj", false);
 
     delete g;

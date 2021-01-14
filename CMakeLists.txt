@@ -40,9 +40,8 @@ set(CPLEXLIBS ilocplex concert cplex12100 cp)
 
 include_directories(.)
 include_directories(sfmt)
-include_directories(OPIM)
 
-file(GLOB SOURCES *.cpp OPIM/*.cpp sfmt/SFMT.c OPIM/SFMT/dSFMT/dSFMT.c)
+file(GLOB SOURCES *.cpp sfmt/SFMT.c)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CPLEXLIBS})
