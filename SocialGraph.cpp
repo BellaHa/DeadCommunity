@@ -403,6 +403,7 @@ void SocialGraph::readCommunityFile(string file, bool isMM) {
                     iss >> nodeIndex;
                     commNodes.push_back(listNodeIds[nodeIndex]);
                 }
+                commNodes.pop_back();
                 actualCommNodeIds.push_back(commNodes);
                 commNodes.clear();
             }

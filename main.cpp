@@ -40,6 +40,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "GIA: " << reGIA << endl;
     cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl;
+    return;
 
     cout << "HD..." << endl;
     HighDegree hd(g);
