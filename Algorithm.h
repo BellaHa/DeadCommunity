@@ -31,6 +31,7 @@ public:
     virtual void generateDCRgraphs(int number);
 
     virtual void initiate();
+    double calculateCost(vector<int> sol);
 
 protected:
     SocialGraph *g;

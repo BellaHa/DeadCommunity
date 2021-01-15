@@ -194,5 +194,9 @@ void Algorithm::clear() {
     intialGain.clear();
 }
 
+double Algorithm::calculateCost(vector<int> sol) {
+    return (double) sol.size();
+}
+
 
 

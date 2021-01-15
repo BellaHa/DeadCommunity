@@ -29,6 +29,7 @@ public:
 
     void initiate();
 
+
 private:
     double getMarginalGain(int nodeId, vector<int> *sol);
 

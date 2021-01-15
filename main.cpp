@@ -1,29 +1,25 @@
-#include<iostream>
+#include <iostream>
+#include <omp.h>
+#include <time.h>
+#include <fstream>
+#include <string>
 #include "SocialGraph.h"
 #include "DCRgenerator.h"
-//#include "ExactSolution.h"
 #include "GreedySolution.h"
 #include "SandwichSolution.h"
+#include "SSA.h"
+#include "GIA.h"
+#include "HighDegree.h"
 #include "BoundedThres.h"
 #include "CompareGreedy.h"
 #include "HighInfluence.h"
 #include "HighTouch.h"
 #include "HighBenefit.h"
-#include "SSA.h"
-#include <omp.h>
-#include <time.h>
-#include <fstream>
 #include "Constant.h"
-#include <stdlib.h>
-#include <string>
-#include "GIA.h"
-#include "HighDegree.h"
 
 using namespace std;
 
 #pragma warning(disable : 4996)
-
-using namespace std;
 
 SocialGraph *g;
 ofstream writefile;
@@ -35,51 +31,63 @@ void printResult(bool isScalable, bool isLargeFile) {
     sol.clear();
 
     GIA gia(g);
-    long startGIA = time(NULL);
     double reGIA = 0;
+    long startGIA = time(NULL);
     gia.getSolution(&sol, &reGIA);
     long timeGIA = time(NULL) - startGIA;
+    double costGIA = gia.calculateCost(sol);
     cout << "GIA: " << reGIA << endl;
+    cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl;
-    cout << sol.size() << endl;
 
     HighDegree hd(g);
-    long startHD = time(NULL);
     double reHD = 0;
+    long startHD = time(NULL);
     hd.getSolution(&sol, &reHD);
     long timeHD = time(NULL) - startHD;
+    double costHD = hd.calculateCost(sol);
     cout << "HD: " << reHD << endl;
+    cout << "HD Cost: " << costHD << endl;
     cout << "HD Time: " << timeHD << endl;
-    cout << sol.size() << endl;
 
     GreedySolution maf(g);
-    long startMaf = time(NULL);
     double remaf = 0;
+    long startMaf = time(NULL);
     maf.getSolution(&sol, &remaf);
     long timeMaf = time(NULL) - startMaf;
+    double costMaf = maf.calculateCost(sol);
     cout << "MAF: " << remaf << endl;
+    cout << "MAF Cost: " << costMaf << endl;
     cout << "MAF Time: " << timeMaf << endl;
-    cout << sol.size() << endl;
 
     SandwichSolution ubg(g);
-    long startUbg = time(NULL);
     double reubg = 0;
+    long startUbg = time(NULL);
     ubg.getSolution(&sol, &reubg);
     long timeUbg = time(NULL) - startUbg;
+    double costUbg = ubg.calculateCost(sol);
     cout << "UBG: " << reubg << endl;
+    cout << "UBG Cost: " << costUbg << endl;
     cout << "UBG Time: " << timeUbg << endl;
-    cout << sol.size() << endl;
 
     SSA ssa(g);
     double reSSA = 0;
-    long startSSA = time(NULL);
     ssa.graphBinFile = graphBinFile;
     ssa.seedFile = seedFile;
+    long startSSA = time(NULL);
     ssa.getSolution(&sol, &reSSA);
     long timeSSA = time(NULL) - startSSA;
+    double costSSA = ssa.calculateCost(sol);
     cout << "SSA: " << reSSA << endl;
+    cout << "SSA Cost: " << costSSA << endl;
     cout << "SSA Time: " << timeSSA << endl;
-    cout << sol.size() << endl;
+
+    writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
+              << "," << reGIA << "," << costGIA << "," << timeGIA
+              << "," << reHD << "," << costHD << "," << timeHD
+              << "," << remaf << "," << costMaf << "," << timeMaf
+              << "," << reubg << "," << costUbg << "," << timeUbg
+              << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
 
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
@@ -108,20 +116,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     // double reHb = 0;
     // hb.getSolution(&sol, &reHb);
     // long timeHB = time(NULL) - startHB;
-    //
     // cout << "HB: " << reHb << endl;
-
-    writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION << "," << reGIA << "," << timeGIA
-              << "," << reHD << "," << timeHD
-              << "," << remaf << "," << timeMaf
-              << "," << reubg << "," << timeUbg
-              << "," << reSSA << "," << timeSSA << endl;
-    // //<< "\t" << reGrd << " " << timeGrd
-    //           << (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile ? "\t" + to_string(reBt) + " " + to_string(timeBt)
-    //                                                              : "")
-    //           //<< "\t" << reHi << " " << timeHi
-    //           << "\t" << reHb << " " << timeHB
-    //           << "\t" << reSSA << " " << timeSSA << endl;
 }
 
 void runExperiment(string input, string inputCommunity, int min, int max, int step,
@@ -140,7 +135,6 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         g->readCommunityFile("../data/" + inputCommunity, isCommMM);
     }
 
-
     string outfilename = "../results/" + input + "_result_"
                          + (isScalable ? "scalable_" : "2step_")
                          + (Constant::IS_BOUNDED_THRESHOLD ? "boundedThres" : "freeThres")
@@ -152,7 +146,11 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
             writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t bt \t hb \t ssa" << endl;
         else
-            writefile << "k,Pop,gia,gia-time,hd,hd-time,maf,maf-time,ubg,ubg-time,ssa,ssa-time" << endl;
+            writefile << "k,Pop,gia,gia-cost,gia-time,"
+                      << "hd,hd-cost,hd-time,"
+                      << "maf,maf-cost,maf-time,"
+                      << "ubg,ubg-cost,ubg-time,"
+                      << "ssa,ssa-cost,ssa-time" << endl;
         // writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t hb \t ssa" << endl;
 
         if (changeK) {
