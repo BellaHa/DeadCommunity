@@ -33,64 +33,43 @@ string seedFile;
 void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
     sol.clear();
+
+    GIA gia(g);
+    long startGIA = time(NULL);
+    double reGIA = 0;
+    gia.getSolution(&sol, &reGIA);
+    long timeGIA = time(NULL) - startGIA;
+    cout << "GIA: " << reGIA << endl;
+    cout << "GIA Time: " << timeGIA << endl;
+    cout << sol.size() << endl;
+
+    HighDegree hd(g);
+    long startHD = time(NULL);
+    double reHD = 0;
+    hd.getSolution(&sol, &reHD);
+    long timeHD = time(NULL) - startHD;
+    cout << "HD: " << reHD << endl;
+    cout << "HD Time: " << timeHD << endl;
+    cout << sol.size() << endl;
+
     GreedySolution maf(g);
     long startMaf = time(NULL);
     double remaf = 0;
-    if (isScalable)
-        maf.getSolution(&sol, &remaf);
-    else
-        maf.getSolution2Step(&sol, &remaf);
+    maf.getSolution(&sol, &remaf);
     long timeMaf = time(NULL) - startMaf;
-
     cout << "MAF: " << remaf << endl;
     cout << "MAF Time: " << timeMaf << endl;
+    cout << sol.size() << endl;
 
-    // HighDegree hd(g);
-    // long startHD = time(NULL);
-    // double reHD = 0;
-    // if (isScalable)
-    //     hd.getSolution(&sol, &reHD);
-    // else
-    //     hd.getSolution2Step(&sol, &reHD);
-    // long timeHD = time(NULL) - startHD;
-    // cout << "HD: " << reHD << endl;
-    // cout << "HD Time: " << timeHD << endl;
-    // cout << sol.size() << endl;
-    // return;
+    SandwichSolution ubg(g);
+    long startUbg = time(NULL);
+    double reubg = 0;
+    ubg.getSolution(&sol, &reubg);
+    long timeUbg = time(NULL) - startUbg;
+    cout << "UBG: " << reubg << endl;
+    cout << "UBG Time: " << timeUbg << endl;
+    cout << sol.size() << endl;
 
-    // GIA gia(g);
-    // long startGIA = time(NULL);
-    // double reGIA = 0;
-    // if (isScalable)
-    //     gia.getSolution(&sol, &reGIA);
-    // else
-    //     gia.getSolution2Step(&sol, &reGIA);
-    // long timeGIA = time(NULL) - startGIA;
-    // cout << "GIA: " << reGIA << endl;
-    // cout << "GIA Time: " << timeGIA << endl;
-    // cout << sol.size() << endl;
-    // // for (int i = 0; i < sol.size(); ++i) {
-    // //     cout << sol.at(i) << "   ";
-    // // }
-    // // cout << endl;
-    //
-    // Constant::K = sol.size();
-    //
-    // SandwichSolution ubg(g);
-    // long startUbg = time(NULL);
-    // double reubg = 0;
-    // if (isScalable)
-    //     ubg.getSolution(&sol, &reubg);
-    // else
-    //     ubg.getSolution2Step(&sol, &reubg);
-    // long timeUbg = time(NULL) - startUbg;
-    // cout << "UBG: " << reubg << endl;
-    // cout << "UBG Time: " << timeUbg << endl;
-    // for (int i = 0; i < sol.size(); ++i) {
-    //     cout << sol.at(i) << "   ";
-    // }
-    // cout << endl;
-    //
     SSA ssa(g);
     double reSSA = 0;
     long startSSA = time(NULL);
@@ -100,7 +79,8 @@ void printResult(bool isScalable, bool isLargeFile) {
     long timeSSA = time(NULL) - startSSA;
     cout << "SSA: " << reSSA << endl;
     cout << "SSA Time: " << timeSSA << endl;
-    //
+    cout << sol.size() << endl;
+
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
     // double reGrd = 0;
@@ -131,9 +111,12 @@ void printResult(bool isScalable, bool isLargeFile) {
     //
     // cout << "HB: " << reHb << endl;
 
-    // writefile << Constant::K << " \t " << Constant::COMMUNITY_POPULATION << "\t" << remaf << " " << timeMaf
-    //           << "\t" << reubg << " " << ratio << " " << timeUbg
-    //           //<< "\t" << reGrd << " " << timeGrd
+    writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION << "," << reGIA << "," << timeGIA
+              << "," << reHD << "," << timeHD
+              << "," << remaf << "," << timeMaf
+              << "," << reubg << "," << timeUbg
+              << "," << reSSA << "," << timeSSA << endl;
+    // //<< "\t" << reGrd << " " << timeGrd
     //           << (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile ? "\t" + to_string(reBt) + " " + to_string(timeBt)
     //                                                              : "")
     //           //<< "\t" << reHi << " " << timeHi
@@ -169,7 +152,8 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
             writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t bt \t hb \t ssa" << endl;
         else
-            writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t hb \t ssa" << endl;
+            writefile << "k,Pop,gia,gia-time,hd,hd-time,maf,maf-time,ubg,ubg-time,ssa,ssa-time" << endl;
+        // writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t hb \t ssa" << endl;
 
         if (changeK) {
             if (!isDirected)
@@ -193,15 +177,14 @@ int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
 
-    string dir = "../data/";
     vector<string> graphs{"facebook"};
     // vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
     for (int i = 0; i < graphs.size(); ++i) {
         string graph = graphs[i];
         graphBinFile = "D:/DeadCommunity/data/" + graph + "SSA.bin";
         seedFile = "D:/DeadCommunity/data/" + graph + ".seeds";
-        string input = dir + graph + "E.txt";
-        string inputCommunity = dir + graph + "Comm.txt";
+        string input = graph + "E.txt";
+        string inputCommunity = graph + "Comm.txt";
         runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
     }
     // runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
