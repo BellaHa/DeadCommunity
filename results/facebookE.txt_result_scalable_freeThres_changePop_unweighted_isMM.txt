@@ -1,1 +1,2 @@
-k 	 Pop 	 maf 	 ubg-ratio 	 grd 	 hb 	 ssa
+k,Pop,gia,gia-time,hd,hd-time,maf,maf-time,ubg,ubg-time,ssa,ssa-time
+10,8,80.2385,0,80.1262,0,4.41292,58,2.8727,451,8.75143,6

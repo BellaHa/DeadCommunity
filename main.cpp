@@ -187,30 +187,19 @@ int main() {
         string inputCommunity = graph + "Comm.txt";
         runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
     }
-    // runExperiment("wikiE.txt", "wikiComm.txt", 4, 10, 2, true, false, false, false, true, false);
-    // runExperiment("epinionsE.txt", "epinionsComm.txt", 4, 10, 2, true, false, false, false, true, false);
-    // runExperiment("dblpE.txt", "dblpComm.txt", 4, 10, 2, true, false, false, false, true, false);
 
     // Generate community
-    // g->generateEdgeWeight("../data/facebook.txt", "../data/facebookE.txt");
-    // g->readSocialGraph("../data/facebookE.txt", true);
-    // g->formCommunityModularity("../data/facebookComm.txt", "../data/facebook.adj", false);
-    //
-    // g->generateEdgeWeight("../data/wiki.txt", "../data/wikiE.txt");
-    // g->readSocialGraph("../data/wikiE.txt", true);
-    // g->formCommunityModularity("../data/wikiComm.txt", "../data/wiki.adj", false);
-    //
-    // g->generateEdgeWeight("../data/epinions.txt", "../data/epinionsE.txt");
-    // g->readSocialGraph("../data/epinionsE.txt", true);
-    // g->formCommunityModularity("../data/epinionsComm.txt", "../data/epinions.adj", false);
-    //
-    // g->generateEdgeWeight("../data/dblp.txt", "../data/dblpE.txt");
-    // g->readSocialGraph("../data/dblpE.txt", true);
-    // g->formCommunityModularity("../data/dblpComm.txt", "../data/dblp.adj", false);
-
-    // g->generateEdgeWeight("../data/pokec.txt", "../data/pokecE.txt");
-    // g->readSocialGraph("../data/pokecE.txt", true);
-    // g->formCommunityModularity("../data/pokecComm.txt", "../data/pokec.adj", false);
+    for (int i = 0; i < graphs.size(); ++i) {
+        string dir = "../data/";
+        string graph = dir + graphs[i];
+        string txt = graph + ".txt";
+        string etxt = graph + "E.txt";
+        string comm = graph + "Comm.txt";
+        string adj = graph + ".adj";
+        g->generateEdgeWeight(txt, etxt);
+        g->readSocialGraph(etxt, true);
+        g->formCommunityModularity(comm, adj, false);
+    }
 
     delete g;
     return 0;
