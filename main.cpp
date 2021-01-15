@@ -91,6 +91,16 @@ void printResult(bool isScalable, bool isLargeFile) {
     // }
     // cout << endl;
     //
+    SSA ssa(g);
+    double reSSA = 0;
+    long startSSA = time(NULL);
+    ssa.graphBinFile = graphBinFile;
+    ssa.seedFile = seedFile;
+    ssa.getSolution(&sol, &reSSA);
+    long timeSSA = time(NULL) - startSSA;
+    cout << "SSA: " << reSSA << endl;
+    cout << "SSA Time: " << timeSSA << endl;
+    //
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
     // double reGrd = 0;
@@ -112,16 +122,6 @@ void printResult(bool isScalable, bool isLargeFile) {
     //         bt.getSolution2Step(&sol, &reBt);
     //     timeBt = time(NULL) - startBt;
     // }
-
-    // SSA ssa(g);
-    // double reSSA = 0;
-    // long startSSA = time(NULL);
-    // ssa.graphBinFile = graphBinFile;
-    // ssa.seedFile = seedFile;
-    // ssa.getSolution(&sol, &reSSA);
-    // long timeSSA = time(NULL) - startSSA;
-    // cout << "SSA: " << reSSA << endl;
-    // cout << "SSA Time: " << timeSSA << endl;
     //
     // HighBenefit hb(g);
     // long startHB = time(NULL);
