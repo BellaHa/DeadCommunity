@@ -9,9 +9,11 @@ public:
     ~SandwichSolution();
 
     double getDeterministicSolution(vector<int> *sol);
+    double getDeterministicSolutionFast(vector<int> *sol);
 
     //double estimate(vector<int> * sol, double epsilon2, double delta, int tMax);
     double getSolution(vector<int> *sol, double *est);
+    double getSolutionFast(vector<int> *sol, double *est);
 
     double getSolution2Step(vector<int> *sol, double *est);
 

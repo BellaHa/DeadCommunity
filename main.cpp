@@ -30,6 +30,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
     sol.clear();
 
+    cout << "GIA..." << endl;
     GIA gia(g);
     double reGIA = 0;
     long startGIA = time(NULL);
@@ -40,6 +41,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl;
 
+    cout << "HD..." << endl;
     HighDegree hd(g);
     double reHD = 0;
     long startHD = time(NULL);
@@ -50,6 +52,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "HD Cost: " << costHD << endl;
     cout << "HD Time: " << timeHD << endl;
 
+    cout << "MAF..." << endl;
     GreedySolution maf(g);
     double remaf = 0;
     long startMaf = time(NULL);
@@ -60,16 +63,18 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "MAF Cost: " << costMaf << endl;
     cout << "MAF Time: " << timeMaf << endl;
 
+    cout << "UBG..." << endl;
     SandwichSolution ubg(g);
     double reubg = 0;
     long startUbg = time(NULL);
-    ubg.getSolution(&sol, &reubg);
+    ubg.getSolutionFast(&sol, &reubg);
     long timeUbg = time(NULL) - startUbg;
     double costUbg = ubg.calculateCost(sol);
     cout << "UBG: " << reubg << endl;
     cout << "UBG Cost: " << costUbg << endl;
     cout << "UBG Time: " << timeUbg << endl;
 
+    cout << "DSSA..." << endl;
     SSA ssa(g);
     double reSSA = 0;
     ssa.graphBinFile = graphBinFile;
@@ -78,9 +83,9 @@ void printResult(bool isScalable, bool isLargeFile) {
     ssa.getSolution(&sol, &reSSA);
     long timeSSA = time(NULL) - startSSA;
     double costSSA = ssa.calculateCost(sol);
-    cout << "SSA: " << reSSA << endl;
-    cout << "SSA Cost: " << costSSA << endl;
-    cout << "SSA Time: " << timeSSA << endl;
+    cout << "DSSA: " << reSSA << endl;
+    cout << "DSSA Cost: " << costSSA << endl;
+    cout << "DSSA Time: " << timeSSA << endl;
 
     writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
               << "," << reGIA << "," << costGIA << "," << timeGIA
@@ -119,9 +124,9 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "HB: " << reHb << endl;
 }
 
-void runExperiment(string input, string inputCommunity, int min, int max, int step,
-                   bool isScalable = true, bool isBoundedThres = false, bool isLargeFile = false,
-                   bool changeK = false, bool isDirected = true, bool isWeighted = false, bool isCommMM = true) {
+void runExperiment(string input, string inputCommunity, int min, int max, int step, bool isScalable = true,
+                   bool isBoundedThres = false, bool isLargeFile = false, bool changeK = false, bool isDirected = true,
+                   bool isWeighted = false, bool isCommMM = true) {
     Constant::IS_BOUNDED_THRESHOLD = isBoundedThres;
     Constant::IS_WEIGHTED = isWeighted;
     Constant::COMMUNITY_POPULATION = 8;
@@ -140,7 +145,7 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
                          + (Constant::IS_BOUNDED_THRESHOLD ? "boundedThres" : "freeThres")
                          + (changeK ? "_changeK" : "_changePop")
                          + (isWeighted ? "_weighted" : "_unweighted")
-                         + (isCommMM ? "_isMM" : "_isClauset") + ".txt";
+                         + (isCommMM ? "_isMM" : "_isClauset") + ".csv";
     writefile.open(outfilename);
     if (writefile.is_open()) {
         if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
@@ -150,7 +155,7 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
                       << "hd,hd-cost,hd-time,"
                       << "maf,maf-cost,maf-time,"
                       << "ubg,ubg-cost,ubg-time,"
-                      << "ssa,ssa-cost,ssa-time" << endl;
+                      << "dssa,dssa-cost,dssa-time" << endl;
         // writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t hb \t ssa" << endl;
 
         if (changeK) {
@@ -187,17 +192,17 @@ int main() {
     }
 
     // Generation
-    for (int i = 0; i < graphs.size(); ++i) {
-        string dir = "../data/";
-        string graph = dir + graphs[i];
-        string txt = graph + ".txt";
-        string etxt = graph + "E.txt";
-        string comm = graph + "Comm.txt";
-        string adj = graph + ".adj";
-        g->generateEdgeWeight(txt, etxt);
-        g->readSocialGraph(etxt, true);
-        g->formCommunityModularity(comm, adj, false);
-    }
+    // for (int i = 0; i < graphs.size(); ++i) {
+    //     string dir = "../data/";
+    //     string graph = dir + graphs[i];
+    //     string txt = graph + ".txt";
+    //     string etxt = graph + "E.txt";
+    //     string comm = graph + "Comm.txt";
+    //     string adj = graph + ".adj";
+    //     g->generateEdgeWeight(txt, etxt);
+    //     g->readSocialGraph(etxt, true);
+    //     g->formCommunityModularity(comm, adj, false);
+    // }
 
     delete g;
     return 0;
