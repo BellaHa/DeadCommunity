@@ -176,7 +176,6 @@ double SandwichSolution::getSolutionFast(vector<int> *sol, double *est) {
 
         int tmp2 = dcrSet.size();
         generateDCRgraphs(2 * tmp - tmp2);
-
     }
     double re = getDeterministicSolutionFast(sol);
     *est = estimateInf(sol);

@@ -50,7 +50,6 @@ double HighDegree::getDeterministicSolution(vector<int> *sol) {
         for (int i = 0; i < dcrSet.size(); i++) {
             map<int, int> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNode((*nodeIds)[maxInd],
                                                                                            &(currentLive[i]));
-
 #pragma omp critical
             {
                 for (map<int, int>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
@@ -58,7 +57,6 @@ double HighDegree::getDeterministicSolution(vector<int> *sol) {
                     // heap.heapify(mapNodeIdx[it->first]);
                 }
             }
-
         }
         // } else break;
     }
