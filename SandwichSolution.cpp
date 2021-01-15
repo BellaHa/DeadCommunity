@@ -148,7 +148,6 @@ double SandwichSolution::getSolution(vector<int> *sol, double *est) {
 
         int tmp2 = dcrSet.size();
         generateDCRgraphs(2 * tmp - tmp2);
-
     }
     double re = getDeterministicSolution(sol);
     *est = estimateInf(sol);
@@ -181,6 +180,55 @@ double SandwichSolution::getSolutionFast(vector<int> *sol, double *est) {
     *est = estimateInf(sol);
     clear();
     return (*est) / re;
+}
+
+double SandwichSolution::getSolutionFastBS(vector<int> *sol, double *est, int left, int right) {
+    if (left >= right) return *est;
+    vector<int> sol1;
+    double est1;
+    double K = (double) g->getNumberOfCommunities();
+    double e = Constant::EPSILON;
+    Constant::K = left + (right - left) / 2;
+    cout << "K: " << Constant::K << endl;
+    getSolutionFast(&sol1, &est1);
+    cout << "size: " << sol1.size() << endl;
+    est1 = Algorithm::estimate(&sol1, Constant::EPSILON, Constant::DELTA, 100000000);
+    cout << "est1: " << est1 << endl;
+    cout << "-----\n";
+    if (est1 >= K - e * K) {
+        *sol = sol1;
+        *est = est1;
+        if (sol1.size() < Constant::K) {
+            Constant::K = sol1.size();
+        }
+        return getSolutionFastBS(sol, est, left, Constant::K);
+    }
+    return getSolutionFastBS(sol, est, Constant::K + 1, right);
+
+    // sol->clear();
+    // initiate();
+    // omp_set_num_threads(Constant::NUM_THREAD);
+    // generateDCRgraphs((int) D);
+    //
+    // while (dcrSet.size() < rMax) {
+    //     double re = getDeterministicSolutionFast(sol);
+    //     int tmp = dcrSet.size();
+    //     *est = estimateInf(sol);
+    //     if (dcrSet.size() * (*est) / (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) >=
+    //         D) {
+    //         double re2 = estimate(sol, e2, Constant::DELTA / 3, dcrSet.size());
+    //         cout << re << " " << re2 << " " << time(NULL) << endl;
+    //         if (re <= (1 + e1) * re2)
+    //             return (*est) / re;
+    //     }
+    //
+    //     int tmp2 = dcrSet.size();
+    //     generateDCRgraphs(2 * tmp - tmp2);
+    // }
+    // double re = getDeterministicSolutionFast(sol);
+    // *est = estimateInf(sol);
+    // clear();
+    // return (*est) / re;
 }
 
 double SandwichSolution::getSolution2Step(vector<int> *sol, double *est) {

@@ -30,16 +30,16 @@ void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
     sol.clear();
 
-    // cout << "GIA..." << endl;
-    // GIA gia(g);
-    // double reGIA = 0;
-    // long startGIA = time(NULL);
-    // gia.getSolution(&sol, &reGIA);
-    // long timeGIA = time(NULL) - startGIA;
-    // double costGIA = gia.calculateCost(sol);
-    // cout << "GIA: " << reGIA << endl;
-    // cout << "GIA Cost: " << costGIA << endl;
-    // cout << "GIA Time: " << timeGIA << endl;
+    cout << "GIA..." << endl;
+    GIA gia(g);
+    double reGIA = 0;
+    long startGIA = time(NULL);
+    gia.getSolution(&sol, &reGIA);
+    long timeGIA = time(NULL) - startGIA;
+    double costGIA = gia.calculateCost(sol);
+    cout << "GIA: " << reGIA << endl;
+    cout << "GIA Cost: " << costGIA << endl;
+    cout << "GIA Time: " << timeGIA << endl;
     //
     // cout << "HD..." << endl;
     // HighDegree hd(g);
@@ -67,7 +67,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     SandwichSolution ubg(g);
     double reubg = 0;
     long startUbg = time(NULL);
-    ubg.getSolutionFast(&sol, &reubg);
+    ubg.getSolutionFastBS(&sol, &reubg, 1, g->getNumberOfNodes());
     long timeUbg = time(NULL) - startUbg;
     double costUbg = ubg.calculateCost(sol);
     cout << "UBG: " << reubg << endl;

@@ -14,6 +14,7 @@ public:
     //double estimate(vector<int> * sol, double epsilon2, double delta, int tMax);
     double getSolution(vector<int> *sol, double *est);
     double getSolutionFast(vector<int> *sol, double *est);
+    double getSolutionFastBS(vector<int> *sol, double *est, int left, int right);
 
     double getSolution2Step(vector<int> *sol, double *est);
 

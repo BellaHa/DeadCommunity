@@ -133,13 +133,13 @@ double GIA::getSolution(vector<int> *sol, double *est) {
     initiate();
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphs((int) n1);
+    double epsilon = Constant::EPSILON;
+    double K = (double) g->getNumberOfCommunities();
 
     double re = 0.;
     for (int i = 0; i < iMax; ++i) {
         re = getDeterministicSolution(sol);
         *est = estimateInf(sol);
-        double epsilon = Constant::EPSILON;
-        double K = (double) g->getNumberOfCommunities();
         if (*est >= (K - epsilon * K) || i == iMax - 1) {
             break;
         } else {
