@@ -1,6 +1,6 @@
 #include <iostream>
 #include <omp.h>
-#include <time.h>
+#include <ctime>
 #include <fstream>
 #include <string>
 #include "SocialGraph.h"
