@@ -188,7 +188,7 @@ int main() {
         runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
     }
 
-    // Generate community
+    // Generation
     for (int i = 0; i < graphs.size(); ++i) {
         string dir = "../data/";
         string graph = dir + graphs[i];
