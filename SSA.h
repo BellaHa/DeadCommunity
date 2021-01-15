@@ -14,6 +14,7 @@ public:
     double getDeterministicSolution(vector<int> *sol);
 
     double getSolution(vector<int> *sol, double *est);
+    double getSolutionBS(vector<int> *sol, double *est, int left, int right);
 
 private:
     string graphSSAformat;

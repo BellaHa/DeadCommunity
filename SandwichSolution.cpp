@@ -183,17 +183,18 @@ double SandwichSolution::getSolutionFast(vector<int> *sol, double *est) {
 }
 
 double SandwichSolution::getSolutionFastBS(vector<int> *sol, double *est, int left, int right) {
-    if (left >= right) return *est;
+    if (left >= right) return 1;
     vector<int> sol1;
     double est1;
     double K = (double) g->getNumberOfCommunities();
     double e = Constant::EPSILON;
     Constant::K = left + (right - left) / 2;
-    cout << "K: " << Constant::K << endl;
     getSolutionFast(&sol1, &est1);
+    cout << "K: " << Constant::K << endl;
     cout << "size: " << sol1.size() << endl;
     est1 = Algorithm::estimate(&sol1, Constant::EPSILON, Constant::DELTA, 100000000);
     cout << "est1: " << est1 << endl;
+    cout << "ratio: " << est1 * 100. / g->getNumberOfCommunities() << endl;
     cout << "-----\n";
     if (est1 >= K - e * K) {
         *sol = sol1;

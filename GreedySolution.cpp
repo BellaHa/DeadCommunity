@@ -2,35 +2,33 @@
 #include <omp.h>
 
 
-GreedySolution::GreedySolution(SocialGraph * g) : Algorithm(g)
-{
-	int numberOfCommunities = g->getNumberOfCommunities();
-	for (int i = 0; i < numberOfCommunities; i++) {
-		countAppearance.push_back(0);
-		communityIdx.push_back(i);
-	}
+GreedySolution::GreedySolution(SocialGraph *g) : Algorithm(g) {
+    int numberOfCommunities = g->getNumberOfCommunities();
+    for (int i = 0; i < numberOfCommunities; i++) {
+        countAppearance.push_back(0);
+        communityIdx.push_back(i);
+    }
 
-	vector<int> * listNodes = g->getListNodeIds();
-	countNodeAppearance = vector<int>(listNodes->size(), 0);
+    vector<int> *listNodes = g->getListNodeIds();
+    countNodeAppearance = vector<int>(listNodes->size(), 0);
 
-	isMaf = true;
+    isMaf = true;
 }
 
-GreedySolution::~GreedySolution()
-{
+GreedySolution::~GreedySolution() {
 }
 
-void GreedySolution::initiateMarginalGain(vector<int> * pendingComm, vector<double> * marginalGain) {	
+void GreedySolution::initiateMarginalGain(vector<int> *pendingComm, vector<double> *marginalGain) {
 
-	for (int i = 0; i < dcrSet.size(); i++) {
-		if (find(pendingComm->begin(), pendingComm->end(), dcrSet[i]->getCommunityId()) != pendingComm->end()) {
-			map<int, int> * mapGain = dcrSet[i]->getTrackGain();
-			int thres = dcrSet[i]->getThreshold();
-			for (map<int, int>::iterator it = mapGain->begin(); it != mapGain->end(); ++it) {
-				(*marginalGain)[it->first] += ((double)it->second)/thres;
-			}
-		}
-	}
+    for (int i = 0; i < dcrSet.size(); i++) {
+        if (find(pendingComm->begin(), pendingComm->end(), dcrSet[i]->getCommunityId()) != pendingComm->end()) {
+            map<int, int> *mapGain = dcrSet[i]->getTrackGain();
+            int thres = dcrSet[i]->getThreshold();
+            for (map<int, int>::iterator it = mapGain->begin(); it != mapGain->end(); ++it) {
+                (*marginalGain)[it->first] += ((double) it->second) / thres;
+            }
+        }
+    }
 }
 
 //double GreedySolution::getDeterministicSolution(vector<int>* sol) {
@@ -190,70 +188,92 @@ void GreedySolution::initiateMarginalGain(vector<int> * pendingComm, vector<doub
 //	return  estimateInf(sol);
 //}
 
-double GreedySolution::getDeterministicSolution(vector<int>* sol)
-{
-	sol->clear();
-	initiateMaf();
+double GreedySolution::getDeterministicSolution(vector<int> *sol) {
+    sol->clear();
+    initiateMaf();
 
-	vector<int> sol1;
-	sol1.clear();
+    vector<int> sol1;
+    sol1.clear();
 
-	InfCost<int> hd(&countAppearance[0]);
-	MappedHeap<InfCost<int>> heap(communityIdx, hd);
+    InfCost<int> hd(&countAppearance[0]);
+    MappedHeap<InfCost<int>> heap(communityIdx, hd);
 
-	while (!heap.empty()) {
-		int commId = heap.pop();
-		vector<int> commNodes(*(g->getNodesOfCommunity(commId)));
-		int h = commNodes.size() * Constant::PERCENTAGE_THRESHOLD;
-		h = h > 0 ? h : 1;
-		if (sol1.size() + h <= Constant::K) {
-			for (int i = 0; i < h; i++) {
-				int r = commonInstance->randomInThread() % commNodes.size();
-				sol1.push_back(commNodes[r]);
-				commNodes.erase(commNodes.begin() + r);
-			}
-		}
-	}
+    while (!heap.empty()) {
+        int commId = heap.pop();
+        vector<int> commNodes(*(g->getNodesOfCommunity(commId)));
+        int h = commNodes.size() * Constant::PERCENTAGE_THRESHOLD;
+        h = h > 0 ? h : 1;
+        if (sol1.size() + h <= Constant::K) {
+            for (int i = 0; i < h; i++) {
+                int r = commonInstance->randomInThread() % commNodes.size();
+                sol1.push_back(commNodes[r]);
+                commNodes.erase(commNodes.begin() + r);
+            }
+        }
+    }
 
-	vector<int> sol2;
-	sol2.clear();
-	vector<int> * listNodes = g->getListNodeIds();
-	InfCost<int> hd2(&countNodeAppearance[0]);
-	MappedHeap<InfCost<int>> heap2(indx, hd2);
-	while (sol2.size() < Constant::K) {
-		unsigned int maxInd = heap2.pop();
-		sol2.push_back(listNodes->at(maxInd));
-	}
+    vector<int> sol2;
+    sol2.clear();
+    vector<int> *listNodes = g->getListNodeIds();
+    InfCost<int> hd2(&countNodeAppearance[0]);
+    MappedHeap<InfCost<int>> heap2(indx, hd2);
+    while (sol2.size() < Constant::K) {
+        unsigned int maxInd = heap2.pop();
+        sol2.push_back(listNodes->at(maxInd));
+    }
 
-	double tmp1 = estimateInf(&sol1);
-	double tmp2 = estimateInf(&sol2);
-	double re;
+    double tmp1 = estimateInf(&sol1);
+    double tmp2 = estimateInf(&sol2);
+    double re;
 
-	if (tmp1 > tmp2) {
-		*sol = sol1;
-		re = tmp1;
-	}
-	else {
-		*sol = sol2;
-		re = tmp2;
-	}
+    if (tmp1 > tmp2) {
+        *sol = sol1;
+        re = tmp1;
+    } else {
+        *sol = sol2;
+        re = tmp2;
+    }
 
-	return re;
+    return re;
 }
 
-void GreedySolution::initiateMaf()
-{
-	for (int i = trackCount; i < dcrSet.size(); i++) {
-		countAppearance[dcrSet[i]->getCommunityId()]++;
+void GreedySolution::initiateMaf() {
+    for (int i = trackCount; i < dcrSet.size(); i++) {
+        countAppearance[dcrSet[i]->getCommunityId()]++;
 
-		vector<int> * touchNodes = dcrSet[i]->getListTouchedNode();
-		for (int j = 0; j < touchNodes->size(); j++) {
-			int nodeId = touchNodes->at(j);
-			countNodeAppearance[mapNodeIdx[nodeId]]++;
-		}
-	}
+        vector<int> *touchNodes = dcrSet[i]->getListTouchedNode();
+        for (int j = 0; j < touchNodes->size(); j++) {
+            int nodeId = touchNodes->at(j);
+            countNodeAppearance[mapNodeIdx[nodeId]]++;
+        }
+    }
 
-	trackCount = dcrSet.size();
+    trackCount = dcrSet.size();
+}
+
+double GreedySolution::getSolutionBS(vector<int> *sol, double *est, int left, int right) {
+    if (left >= right) return 1;
+    vector<int> sol1;
+    double est1;
+    double K = (double) g->getNumberOfCommunities();
+    double e = Constant::EPSILON;
+    Constant::K = left + (right - left) / 2;
+    getSolution(&sol1, &est1);
+    cout << "K: " << Constant::K << endl;
+    cout << "size: " << sol1.size() << endl;
+    est1 = Algorithm::estimate(&sol1, Constant::EPSILON, Constant::DELTA, 100000000);
+    cout << "est1: " << est1 << endl;
+    cout << "ratio: " << est1 * 100. / g->getNumberOfCommunities() << endl;
+    cout << "-----\n";
+    if (est1 >= K - e * K) {
+        *sol = sol1;
+        *est = est1;
+        if (sol1.size() < Constant::K) {
+            Constant::K = sol1.size();
+        }
+        return getSolutionBS(sol, est, left, Constant::K);
+    }
+    return getSolutionBS(sol, est, Constant::K + 1, right);
 }
 
 

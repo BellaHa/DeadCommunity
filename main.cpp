@@ -40,28 +40,28 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "GIA: " << reGIA << endl;
     cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl;
-    //
-    // cout << "HD..." << endl;
-    // HighDegree hd(g);
-    // double reHD = 0;
-    // long startHD = time(NULL);
-    // hd.getSolution(&sol, &reHD);
-    // long timeHD = time(NULL) - startHD;
-    // double costHD = hd.calculateCost(sol);
-    // cout << "HD: " << reHD << endl;
-    // cout << "HD Cost: " << costHD << endl;
-    // cout << "HD Time: " << timeHD << endl;
-    //
-    // cout << "MAF..." << endl;
-    // GreedySolution maf(g);
-    // double remaf = 0;
-    // long startMaf = time(NULL);
-    // maf.getSolution(&sol, &remaf);
-    // long timeMaf = time(NULL) - startMaf;
-    // double costMaf = maf.calculateCost(sol);
-    // cout << "MAF: " << remaf << endl;
-    // cout << "MAF Cost: " << costMaf << endl;
-    // cout << "MAF Time: " << timeMaf << endl;
+
+    cout << "HD..." << endl;
+    HighDegree hd(g);
+    double reHD = 0;
+    long startHD = time(NULL);
+    hd.getSolution(&sol, &reHD);
+    long timeHD = time(NULL) - startHD;
+    double costHD = hd.calculateCost(sol);
+    cout << "HD: " << reHD << endl;
+    cout << "HD Cost: " << costHD << endl;
+    cout << "HD Time: " << timeHD << endl;
+
+    cout << "MAF..." << endl;
+    GreedySolution maf(g);
+    double remaf = 0;
+    long startMaf = time(NULL);
+    maf.getSolutionBS(&sol, &remaf,1, g->getNumberOfNodes());
+    long timeMaf = time(NULL) - startMaf;
+    double costMaf = maf.calculateCost(sol);
+    cout << "MAF: " << remaf << endl;
+    cout << "MAF Cost: " << costMaf << endl;
+    cout << "MAF Time: " << timeMaf << endl;
 
     cout << "UBG..." << endl;
     SandwichSolution ubg(g);
@@ -74,25 +74,25 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "UBG Cost: " << costUbg << endl;
     cout << "UBG Time: " << timeUbg << endl;
 
-    // cout << "DSSA..." << endl;
-    // SSA ssa(g);
-    // double reSSA = 0;
-    // ssa.graphBinFile = graphBinFile;
-    // ssa.seedFile = seedFile;
-    // long startSSA = time(NULL);
-    // ssa.getSolution(&sol, &reSSA);
-    // long timeSSA = time(NULL) - startSSA;
-    // double costSSA = ssa.calculateCost(sol);
-    // cout << "DSSA: " << reSSA << endl;
-    // cout << "DSSA Cost: " << costSSA << endl;
-    // cout << "DSSA Time: " << timeSSA << endl;
-    //
-    // writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
-    //           << "," << reGIA << "," << costGIA << "," << timeGIA
-    //           << "," << reHD << "," << costHD << "," << timeHD
-    //           << "," << remaf << "," << costMaf << "," << timeMaf
-    //           << "," << reubg << "," << costUbg << "," << timeUbg
-    //           << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
+    cout << "DSSA..." << endl;
+    SSA ssa(g);
+    double reSSA = 0;
+    ssa.graphBinFile = graphBinFile;
+    ssa.seedFile = seedFile;
+    long startSSA = time(NULL);
+    ssa.getSolutionBS(&sol, &reSSA,1, g->getNumberOfNodes());
+    long timeSSA = time(NULL) - startSSA;
+    double costSSA = ssa.calculateCost(sol);
+    cout << "DSSA: " << reSSA << endl;
+    cout << "DSSA Cost: " << costSSA << endl;
+    cout << "DSSA Time: " << timeSSA << endl;
+
+    writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
+              << "," << reGIA << "," << costGIA << "," << timeGIA
+              << "," << reHD << "," << costHD << "," << timeHD
+              << "," << remaf << "," << costMaf << "," << timeMaf
+              << "," << reubg << "," << costUbg << "," << timeUbg
+              << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
 
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
