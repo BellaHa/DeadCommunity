@@ -2,6 +2,7 @@
 
 #include "Algorithm.h"
 #include <time.h>
+#include "StopWatch.h"
 
 class SSA : public Algorithm {
 public:

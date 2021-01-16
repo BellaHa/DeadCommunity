@@ -10,6 +10,7 @@
 #include "SSA.h"
 #include "GIA.h"
 #include "HighDegree.h"
+#include "StopWatch.h"
 #include "BoundedThres.h"
 #include "CompareGreedy.h"
 #include "HighInfluence.h"
@@ -29,13 +30,15 @@ string seedFile;
 void printResult(bool isScalable, bool isLargeFile) {
     vector<int> sol;
     sol.clear();
+    StopWatch sw;
 
     cout << "GIA..." << endl;
     GIA gia(g);
     double reGIA = 0;
-    long startGIA = time(NULL);
+    sw.start();
     gia.getSolution(&sol, &reGIA);
-    long timeGIA = time(NULL) - startGIA;
+    sw.stop();
+    double timeGIA = sw.getSeconds();
     double costGIA = gia.calculateCost(sol);
     cout << "GIA: " << reGIA << endl;
     cout << "GIA Cost: " << costGIA << endl;
@@ -44,9 +47,10 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "HD..." << endl;
     HighDegree hd(g);
     double reHD = 0;
-    long startHD = time(NULL);
+    sw.start();
     hd.getSolution(&sol, &reHD);
-    long timeHD = time(NULL) - startHD;
+    sw.stop();
+    double timeHD = sw.getSeconds();
     double costHD = hd.calculateCost(sol);
     cout << "HD: " << reHD << endl;
     cout << "HD Cost: " << costHD << endl;
@@ -55,9 +59,10 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "MAF..." << endl;
     GreedySolution maf(g);
     double remaf = 0;
-    long startMaf = time(NULL);
+    sw.start();
     maf.getSolutionBS(&sol, &remaf,1, g->getNumberOfNodes());
-    long timeMaf = time(NULL) - startMaf;
+    sw.stop();
+    double timeMaf = sw.getSeconds();
     double costMaf = maf.calculateCost(sol);
     cout << "MAF: " << remaf << endl;
     cout << "MAF Cost: " << costMaf << endl;
@@ -66,9 +71,10 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "UBG..." << endl;
     SandwichSolution ubg(g);
     double reubg = 0;
-    long startUbg = time(NULL);
+    sw.start();
     ubg.getSolutionFastBS(&sol, &reubg, 1, g->getNumberOfNodes());
-    long timeUbg = time(NULL) - startUbg;
+    sw.stop();
+    double timeUbg = sw.getSeconds();
     double costUbg = ubg.calculateCost(sol);
     cout << "UBG: " << reubg << endl;
     cout << "UBG Cost: " << costUbg << endl;

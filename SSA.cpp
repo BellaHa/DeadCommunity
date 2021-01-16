@@ -48,11 +48,11 @@ double SSA::getSolution(vector<int> *sol, double *est) {
         inputFile.close();
     }
 
-    long startEst = time(NULL);
+    StopWatch sw;
+    sw.start();
     *est = estimate(sol, Constant::EPSILON, Constant::DELTA, 100000000);
-    long timeEst = time(NULL) - startEst;
-    cout << "est time: " << timeEst << endl;
-    bsTime += timeEst;
+    sw.stop();
+    bsTime += sw.getSeconds();
     clear();
     return 1;
 }
