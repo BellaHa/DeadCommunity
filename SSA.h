@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Algorithm.h"
+#include <time.h>
 
 class SSA : public Algorithm {
 public:
     string graphBinFile;
     string seedFile;
+    double bsTime = 0;
 
     SSA(SocialGraph *g);
 
@@ -14,6 +16,7 @@ public:
     double getDeterministicSolution(vector<int> *sol);
 
     double getSolution(vector<int> *sol, double *est);
+
     double getSolutionBS(vector<int> *sol, double *est, int left, int right);
 
 private:

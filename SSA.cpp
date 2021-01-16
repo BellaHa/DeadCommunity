@@ -36,6 +36,9 @@ double SSA::getSolution(vector<int> *sol, double *est) {
     ifstream inputFile;
     inputFile.open(seedFile);
     if (inputFile) {
+        double et;
+        inputFile >> et;
+        bsTime += et;
         vector<int> *listNodes = g->getListNodeIds();
         int nodeIdx;
         while (inputFile >> nodeIdx) {
@@ -45,7 +48,11 @@ double SSA::getSolution(vector<int> *sol, double *est) {
         inputFile.close();
     }
 
+    long startEst = time(NULL);
     *est = estimate(sol, Constant::EPSILON, Constant::DELTA, 100000000);
+    long timeEst = time(NULL) - startEst;
+    cout << "est time: " << timeEst << endl;
+    bsTime += timeEst;
     clear();
     return 1;
 }

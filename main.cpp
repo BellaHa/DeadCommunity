@@ -79,20 +79,20 @@ void printResult(bool isScalable, bool isLargeFile) {
     double reSSA = 0;
     ssa.graphBinFile = graphBinFile;
     ssa.seedFile = seedFile;
-    long startSSA = time(NULL);
+    ssa.bsTime = 0;
     ssa.getSolutionBS(&sol, &reSSA,1, g->getNumberOfNodes());
-    long timeSSA = time(NULL) - startSSA;
+    double timeSSA = ssa.bsTime;
     double costSSA = ssa.calculateCost(sol);
     cout << "DSSA: " << reSSA << endl;
     cout << "DSSA Cost: " << costSSA << endl;
     cout << "DSSA Time: " << timeSSA << endl;
 
-    writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
-              << "," << reGIA << "," << costGIA << "," << timeGIA
-              << "," << reHD << "," << costHD << "," << timeHD
-              << "," << remaf << "," << costMaf << "," << timeMaf
-              << "," << reubg << "," << costUbg << "," << timeUbg
-              << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
+    // writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
+    //           << "," << reGIA << "," << costGIA << "," << timeGIA
+    //           << "," << reHD << "," << costHD << "," << timeHD
+    //           << "," << remaf << "," << costMaf << "," << timeMaf
+    //           << "," << reubg << "," << costUbg << "," << timeUbg
+    //           << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
 
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
