@@ -332,7 +332,7 @@ void SocialGraph::generateFileIM(string outputFile) {
             int nodeId = listNodeIds[i];
             vector<std::pair<int, double>> neighbors = mapIncommingNeighbors[nodeId];
             if (neighbors.size() > 0) {
-                double w = Constant::MODEL ? 1.0 / (neighbors.size() + 1) : 1 /
+                double w = Constant::MODEL ? 1.0 / (neighbors.size() + 1) : 1. /
                                                                             neighbors.size(); // weight is different between LT and IC
                 for (int j = 0; j < neighbors.size(); j++) {
                     int tmp = neighbors[j].first;
@@ -542,6 +542,14 @@ void SocialGraph::clear() {
     noOfEdges = 0;
     hMax = 0;
     bMin = 10000;
+
+    outgoingDegree.clear();
+    incomingDegree.clear();
+    mapNodeWeight.clear();
+    mapNodeCost.clear();
+    mapNodeBenefit.clear();
+    mapIncomingNodes.clear();
+    mapOutgoingNodes.clear();
 }
 
 void SocialGraph::addCommunity(vector<int> *commNodes) {
@@ -552,7 +560,8 @@ void SocialGraph::addCommunity(vector<int> *commNodes) {
         bMin = commNodes->size();
 }
 
-void SocialGraph::generateEdgeWeight(string file, string outfile) {
+void SocialGraph::generateEdgeWeightBinFile(string file, string outfile, string binfile) {
+    clear();
     ifstream in(file);
     if (in) {
         int src, dst;
@@ -603,14 +612,194 @@ void SocialGraph::generateEdgeWeight(string file, string outfile) {
             mapDstWeight[incomingNodes.first] = w;
         }
 
+        int numNodes = nodeIds.size();
         ofstream out(outfile);
+        out << nodeIds.size() << " " << numEdges << endl;
         for (int i = 0; i < numEdges; i++) {
             double w = mapDstWeight[dstNodes[i]];
             out << srcNodes[i] << " " << dstNodes[i] << " " << w << endl;
         }
         out.close();
+
+        ofstream outBin(binfile, fstream::out | fstream::binary);
+        // outputs number of nodes
+        outBin.write((char *) &numNodes, sizeof(int));
+        // outputs number of edges
+        outBin.write((char *) &numEdges, sizeof(int));
+        // outputs node id list
+        for (auto nodeId : nodeIds) {
+            int id = nodeId.first;
+            outBin.write((char *) &id, sizeof(int));
+        }
+        // outputs weights of incoming for dstNode
+        for (auto nodeId : nodeIds) {
+            double weight = 0;
+            if (mapInDegree.find(nodeId.first) != mapInDegree.end()) {
+                weight = mapDstWeight[nodeId.first];
+            }
+            outBin.write((char *) &weight, sizeof(double));
+        }
+        // outputs node's cost
+        map<int, double> mapNodeCost;
+        for (auto nodeId : nodeIds) {
+            double cost = 1;
+            if (mapOutDegree.find(nodeId.first) != mapOutDegree.end()) {
+                cost = ((double) numNodes * mapOutDegree[nodeId.first]) / numEdges;
+            }
+            mapNodeCost[nodeId.first] = cost;
+            outBin.write((char *) &cost, sizeof(double));
+        }
+        // outputs node's benefit
+        for (auto nodeId : nodeIds) {
+            double benefit = ((double) (commonInstance->randomInThread() % 1000)) / 1000;
+            // double benefit = sfmt_genrand_real1(&sfmtSeed) + mapNodeCost[nodeId.first];
+            outBin.write((char *) &benefit, sizeof(double));
+        }
+        // outputs cumulative indegree sequence
+        for (auto nodeId : nodeIds) {
+            int degree = 0;
+            if (mapInDegree.find(nodeId.first) != mapInDegree.end()) {
+                degree = mapInDegree[nodeId.first];
+            }
+            outBin.write((char *) &degree, sizeof(int));
+        }
+        // outputs incoming of dstNode
+        for (auto nodeId : nodeIds) {
+            int degree = 0;
+            vector<int> inNodes(degree);
+            if (mapInDegree.find(nodeId.first) != mapInDegree.end()) {
+                degree = mapInDegree[nodeId.first];
+                inNodes = mapIncomingNodes[nodeId.first];
+            }
+            if (degree > 0) {
+                outBin.write((char *) &inNodes[0], degree * sizeof(int));
+            }
+        }
+        // outputs cumulative outdegree sequence
+        for (auto nodeId : nodeIds) {
+            int degree = 0;
+            if (mapOutDegree.find(nodeId.first) != mapOutDegree.end()) {
+                degree = mapOutDegree[nodeId.first];
+            }
+            outBin.write((char *) &degree, sizeof(int));
+        }
+        // outputs outgoing of dstNode
+        for (auto nodeId : nodeIds) {
+            int degree = 0;
+            vector<int> outNodes(degree);
+            if (mapOutDegree.find(nodeId.first) != mapOutDegree.end()) {
+                degree = mapOutDegree[nodeId.first];
+                outNodes = mapOutgoingNodes[nodeId.first];
+            }
+            if (degree > 0) {
+                outBin.write((char *) &outNodes[0], degree * sizeof(int));
+            }
+        }
+        outBin.close();
         cout << "Generate \"" << outfile << "\" successfully" << endl;
     } else {
         cerr << "Can't open file: " << file << endl;
+    }
+}
+
+void SocialGraph::readSocialGraphBin(string file, bool isDirected) {
+    this->isDirected = isDirected;
+    clear();
+    srand(time(NULL));
+    ifstream inputFile;
+    inputFile.open(file, fstream::in | fstream::binary);
+    if (inputFile) {
+        int noOfNodes;
+        inputFile.read((char *) &noOfNodes, sizeof(int));
+        if (inputFile.rdstate() != ios::goodbit) {
+            cerr << "The file " << file << " is not a valid graph" << endl;
+            exit(EXIT_FAILURE);
+        }
+
+        // reads number of edges
+        inputFile.read((char *) &noOfEdges, sizeof(int));
+
+        // read unique node id list
+        // vector<int> listNodeIds(noOfNodes);
+        listNodeIds.resize(noOfNodes);
+        // mapNodeIdx.clear();
+        inputFile.read((char *) &listNodeIds[0], noOfNodes * sizeof(int));
+        // for (int i = 0; i < noOfNodes; ++i) {
+        //     mapNodeIdx.insert(make_pair(listNodeIds[i], i));
+        // }
+
+        // reads weights of incoming for dstNode
+        for (int i = 0; i < noOfNodes; ++i) {
+            inputFile.read((char *) &mapNodeWeight[listNodeIds[i]], sizeof(double));
+        }
+
+        // reads costs
+        vector<double> nodeCosts(noOfNodes);
+        inputFile.read((char *) &nodeCosts[0], noOfNodes * sizeof(double));
+        // if (arg.nc == 0) {
+        //     nodeCosts.clear();
+        //     nodeCosts.resize(noOfNodes, 1);
+        // }
+        for (int i = 0; i < noOfNodes; ++i) {
+            mapNodeCost[listNodeIds[i]] = nodeCosts[i];
+        }
+        // for (int i = 0; i < noOfNodes; ++i) {
+        //     inputFile.read((char *) &mapNodeCost[listNodeIds[i]], sizeof(double));
+        // }
+
+        // reads benefits
+        vector<double> nodeBenefits(noOfNodes);
+        inputFile.read((char *) &nodeBenefits[0], noOfNodes * sizeof(double));
+        // if (arg.rb == 0) {
+        //     nodeBenefits.clear();
+        //     nodeBenefits.resize(noOfNodes, 1);
+        // }
+        for (int i = 0; i < noOfNodes; ++i) {
+            mapNodeBenefit[listNodeIds[i]] = nodeBenefits[i];
+        }
+        // for (int i = 0; i < noOfNodes; ++i) {
+        //     inputFile.read((char *) &mapNodeBenefit[listNodeIds[i]], sizeof(double));
+        // }
+
+        // reads cumulative indegree sequence
+        incomingDegree.resize(noOfNodes);
+        inputFile.read((char *) &incomingDegree[0], noOfNodes * sizeof(int));
+
+        // reads incoming of dstNode
+        for (int i = 0; i < noOfNodes; ++i) {
+            mapIncomingNodes[listNodeIds[i]].resize(incomingDegree[i]);
+            if (incomingDegree[i] > 0) {
+                inputFile.read((char *) &mapIncomingNodes[listNodeIds[i]][0], incomingDegree[i] * sizeof(int));
+            }
+        }
+
+        // reads cumulative outdegree sequence
+        outgoingDegree.resize(noOfNodes);
+        inputFile.read((char *) &outgoingDegree[0], noOfNodes * sizeof(int));
+
+        // reads outgoing of dstNode
+        for (int i = 0; i < noOfNodes; ++i) {
+            mapOutgoingNodes[listNodeIds[i]].resize(outgoingDegree[i]);
+            if (outgoingDegree[i] > 0) {
+                inputFile.read((char *) &mapOutgoingNodes[listNodeIds[i]][0], outgoingDegree[i] * sizeof(int));
+            }
+        }
+
+        for (map<int, vector<int>>::iterator it = mapIncomingNodes.begin(); it != mapIncomingNodes.end(); ++it) {
+            int dstNode = it->first;
+            vector<int> srcNodes = it->second;
+            double weight = mapNodeWeight[dstNode];
+            for (int i = 0; i < srcNodes.size(); ++i) {
+                int srcNode = srcNodes[i];
+                if (mapIncommingNeighbors.find(dstNode) != mapIncommingNeighbors.end()) {
+                    mapIncommingNeighbors[dstNode].push_back(make_pair(srcNode, weight));
+                } else {
+                    vector<pair<int, double>> tmp;
+                    tmp.push_back(make_pair(srcNode, weight));
+                    mapIncommingNeighbors.insert(make_pair(dstNode, tmp));
+                }
+            }
+        }
+        inputFile.close();
     }
 }

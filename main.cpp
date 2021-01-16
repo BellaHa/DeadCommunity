@@ -60,7 +60,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     GreedySolution maf(g);
     double remaf = 0;
     sw.start();
-    maf.getSolutionBS(&sol, &remaf,1, g->getNumberOfNodes());
+    maf.getSolutionBS(&sol, &remaf, 1, g->getNumberOfNodes());
     sw.stop();
     double timeMaf = sw.getSeconds();
     double costMaf = maf.calculateCost(sol);
@@ -86,7 +86,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     ssa.graphBinFile = graphBinFile;
     ssa.seedFile = seedFile;
     ssa.bsTime = 0;
-    ssa.getSolutionBS(&sol, &reSSA,1, g->getNumberOfNodes());
+    ssa.getSolutionBS(&sol, &reSSA, 1, g->getNumberOfNodes());
     double timeSSA = ssa.bsTime;
     double costSSA = ssa.calculateCost(sol);
     cout << "DSSA: " << reSSA << endl;
@@ -186,29 +186,33 @@ int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
 
-    vector<string> graphs{"facebook"};
-    // vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
-    for (int i = 0; i < graphs.size(); ++i) {
-        string graph = graphs[i];
-        graphBinFile = "D:/DeadCommunity/data/" + graph + "SSA.bin";
-        seedFile = "D:/DeadCommunity/data/" + graph + ".seeds";
-        string input = graph + "E.txt";
-        string inputCommunity = graph + "Comm.txt";
-        runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
-    }
+    // vector<string> graphs{"facebook"};
+    vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
+    // for (int i = 0; i < graphs.size(); ++i) {
+    //     string graph = graphs[i];
+    //     graphBinFile = "D:/DeadCommunity/data/" + graph + "SSA.bin";
+    //     seedFile = "D:/DeadCommunity/data/" + graph + ".seeds";
+    //     string input = graph + "E.txt";
+    //     string inputCommunity = graph + "Comm.txt";
+    //     runExperiment(input, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
+    // }
 
     // Generation
-    // for (int i = 0; i < graphs.size(); ++i) {
-    //     string dir = "../data/";
-    //     string graph = dir + graphs[i];
-    //     string txt = graph + ".txt";
-    //     string etxt = graph + "E.txt";
-    //     string comm = graph + "Comm.txt";
-    //     string adj = graph + ".adj";
-    //     g->generateEdgeWeight(txt, etxt);
-    //     g->readSocialGraph(etxt, true);
-    //     g->formCommunityModularity(comm, adj, false);
-    // }
+    for (int i = 0; i < graphs.size(); ++i) {
+        string dir = "../data/";
+        string graph = dir + graphs[i];
+        cout << graph << endl;
+        string txt = graph + ".txt";
+        string bin = graph + ".bin";
+        string etxt = graph + "E.txt";
+        string comm = graph + "Comm.txt";
+        string adj = graph + ".adj";
+        string ssaFile = graph + "SSA.txt";
+        // g->generateEdgeWeightBinFile(txt, etxt, bin);
+        g->readSocialGraphBin(bin, true);
+        g->generateFileIM(ssaFile);
+        g->formCommunityModularity(comm, adj, false);
+    }
 
     delete g;
     return 0;

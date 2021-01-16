@@ -16,6 +16,8 @@ public:
     void readSocialGraphFromFile(string file); // old format one (communities are generated randomly)
     void readSocialGraph(string file, bool isDirected = false);
 
+    void readSocialGraphBin(string file, bool isDirected = false);
+
     void readSocialGraphFromLargeFile(string inputFile);
 
     void generateFile(string inputFile); // used only to generate graph file from regular downloaded txt file
@@ -32,7 +34,7 @@ public:
 
     int randomSelectCommunity();
 
-    void generateEdgeWeight(string file, string outfile);
+    void generateEdgeWeightBinFile(string file, string outfile, string binfile);
 
     vector<int> *getNodesOfCommunity(int commId);
 
@@ -55,7 +57,14 @@ public:
     int getCommunitySize(int commId);
 
     int getMinBenefit();
+
     vector<int> outgoingDegree;
+    vector<int> incomingDegree;
+    map<int, double> mapNodeWeight;
+    map<int, double> mapNodeCost;
+    map<int, double> mapNodeBenefit;
+    map<int, vector<int>> mapIncomingNodes;
+    map<int, vector<int>> mapOutgoingNodes;
 
 private:
     vector<int> listNodeIds;
