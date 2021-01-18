@@ -54,25 +54,38 @@ void printResult(bool isScalable, bool isLargeFile) {
     gia1.getSolutionMig(&sol, &reGIA1);
     sw.stop();
     double timeGIA1 = sw.getSeconds();
-    double costGIA1 = gia.calculateCost(sol);
+    double costGIA1 = gia.calculateCostMig(sol);
     cout << "GIA: " << reGIA1 << endl;
     cout << "GIA Cost: " << costGIA1 << endl;
     cout << "GIA Time: " << timeGIA1 << endl << endl;
+    return;
 
-    // cout << "HD..." << endl;
-    // HighDegree hd(g);
-    // double reHD = 0;
-    // sw.start();
+    cout << "HD..." << endl;
+    HighDegree hd(g);
+    double reHD = 0;
+    sw.start();
     // if (Constant::GCS)
     //     hd.getSolutionMig(&sol, &reHD);
     // else
-    //     hd.getSolution(&sol, &reHD);
-    // sw.stop();
-    // double timeHD = sw.getSeconds();
-    // double costHD = hd.calculateCost(sol);
-    // cout << "HD: " << reHD << endl;
-    // cout << "HD Cost: " << costHD << endl;
-    // cout << "HD Time: " << timeHD << endl << endl;
+    hd.getSolution(&sol, &reHD);
+    sw.stop();
+    double timeHD = sw.getSeconds();
+    double costHD = hd.calculateCost(sol);
+    cout << "HD: " << reHD << endl;
+    cout << "HD Cost: " << costHD << endl;
+    cout << "HD Time: " << timeHD << endl << endl;
+
+    cout << "HD..." << endl;
+    HighDegree hd1(g);
+    double reHD1 = 0;
+    sw.start();
+    hd1.getSolutionMig(&sol, &reHD1);
+    sw.stop();
+    double timeHD1 = sw.getSeconds();
+    double costHD1 = hd.calculateCost(sol);
+    cout << "HD: " << reHD1 << endl;
+    cout << "HD Cost: " << costHD1 << endl;
+    cout << "HD Time: " << timeHD1 << endl << endl;
     return;
 
     cout << "MAF..." << endl;

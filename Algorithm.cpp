@@ -123,6 +123,29 @@ double Algorithm::estimateInf(vector<int> *sol) {
     return re * (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) / dcrSet.size();
 }
 
+double Algorithm::estimateInfMig(vector<int> *sol) {
+    double K = (double) g->getNumberOfCommunities();
+    double T = (double) dcrSet.size();
+    double nb1 = K - ((K * c) / (3. * T));
+
+    double Xsol = 0.;
+#pragma omp parallel for
+    for (int i = 0; i < dcrSet.size(); i++) {
+        bool kill = dcrSet[i]->isKillMig(sol);
+
+        if (kill) {
+#pragma omp critical
+            {
+                Xsol += 1.0;
+            }
+        }
+    }
+
+    double eSigma = (K / T) * Xsol;
+    double nb2 = K + (K / T) * ((2. * c / 3) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
+    return min(nb1, nb2);
+}
+
 void Algorithm::initiate() {
     double ep1 = Constant::EPSILON - 0.081;
     double ep2 = Constant::EPSILON - ep1;
@@ -203,6 +226,7 @@ void Algorithm::generateDCRgraphsMig(int number) {
     }
     //cout << "done generating samples" << endl;
 }
+
 void Algorithm::clear() {
     for (int i = 0; i < dcrSet.size(); i++)
         delete dcrSet[i];
@@ -220,6 +244,14 @@ void Algorithm::clearMig() {
 
 double Algorithm::calculateCost(vector<int> sol) {
     return (double) sol.size();
+}
+
+double Algorithm::calculateCostMig(vector<int> sol) {
+    double cost = 0.;
+    for (int i = 0; i < sol.size(); ++i) {
+        cost += g->mapNodeCost[sol[i]];
+    }
+    return cost;
 }
 
 

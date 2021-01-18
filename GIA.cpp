@@ -384,25 +384,3 @@ double GIA::estimateInf(vector<int> *sol) {
     return min(nb1, nb2);
 }
 
-double GIA::estimateInfMig(vector<int> *sol) {
-    double K = (double) g->getNumberOfCommunities();
-    double T = (double) dcrSet.size();
-    double nb1 = K - ((K * c) / (3. * T));
-
-    double Xsol = 0.;
-#pragma omp parallel for
-    for (int i = 0; i < dcrSet.size(); i++) {
-        bool kill = dcrSet[i]->isKillMig(sol);
-
-        if (kill) {
-#pragma omp critical
-            {
-                Xsol += 1.0;
-            }
-        }
-    }
-
-    double eSigma = (K / T) * Xsol;
-    double nb2 = K + (K / T) * ((2. * c / 3) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
-    return min(nb1, nb2);
-}

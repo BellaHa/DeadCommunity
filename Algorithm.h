@@ -27,6 +27,7 @@ public:
     virtual double getSolution2Step(vector<int> *sol, double *est);
 
     virtual double estimateInf(vector<int> *sol);
+    double estimateInfMig(vector<int> *sol);
 
     virtual void generateDCRgraphs(int number);
 
@@ -35,8 +36,10 @@ public:
     virtual void initiate();
 
     double calculateCost(vector<int> sol);
+    double calculateCostMig(vector<int> sol);
 
     map<int, double> intialGainB; // initial fraction inf of each nodes, USED in sandwich solution
+    double c;
 
 protected:
     SocialGraph *g;

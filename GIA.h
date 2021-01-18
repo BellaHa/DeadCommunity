@@ -8,7 +8,6 @@ public:
     double n1;
     int iMax;
     double delta1;
-    double c;
 
     GIA(SocialGraph *g);
 
@@ -29,7 +28,6 @@ public:
 
     double estimateInf(vector<int> *sol);
 
-    double estimateInfMig(vector<int> *sol);
 
     void generateDCRgraphs(int number);
 

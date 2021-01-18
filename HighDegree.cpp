@@ -230,15 +230,15 @@ double HighDegree::getSolutionMig(vector<int> *sol, double *est) {
 
     double re = 0.;
     for (int i = 0; i < iMax; ++i) {
-        re = getDeterministicSolution(sol);
-        *est = estimateInf(sol);
+        re = getDeterministicSolutionMig(sol);
+        *est = estimateInfMig(sol);
         if (*est >= (K - epsilon * K) || i == iMax - 1) {
             break;
         } else {
-            generateDCRgraphs(dcrSet.size());
+            generateDCRgraphsMig(dcrSet.size());
         }
     }
-    clear();
+    clearMig();
     return *est / re;
 
     // while (dcrSet.size() < rMax) {
