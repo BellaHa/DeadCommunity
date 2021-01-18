@@ -18,13 +18,15 @@ double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
     vector<int> *nodeIds = g->getListNodeIds();
     vector<double> marginalGain(nodeIds->size(), 0);
     vector<int> oDegree(nodeIds->size(), 0);
+    vector<double> marginalGainB(nodeIds->size(), 0);
 
     currentLive.clear();
     for (int i = 0; i < dcrSet.size(); i++) {
         DCRgraph *dcr = dcrSet[i];
         vector<int> *commNodeIds = dcr->getCommunityNodeIds();
         currentLive.push_back(vector<int>(*commNodeIds));
-        dcr->initiateTrackGain();
+        currentLiveB.push_back(dcr->commBenefit);
+        dcr->initiateTrackGainMig();
     }
 
     //#pragma omp parallel for
@@ -32,6 +34,7 @@ double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
         int u = (*nodeIds)[i];
         marginalGain[i] = intialGain[u];
         oDegree[i] = g->outgoingDegree.at(i);
+        marginalGainB[i] = intialGainB[u];
     }
 
     InfCost<int> hd(&oDegree[0]);
@@ -47,12 +50,14 @@ double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
         // update current live
 #pragma omp parallel for
         for (int i = 0; i < dcrSet.size(); i++) {
-            map<int, int> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNode((*nodeIds)[maxInd],
-                                                                                           &(currentLive[i]));
+            map<int, double> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNodeMig((*nodeIds)[maxInd],
+                                                                                                 &(currentLive[i]),
+                                                                                                 &(currentLiveB[i]));
 #pragma omp critical
             {
-                for (map<int, int>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
+                for (map<int, double>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
                     marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
+                    marginalGainB[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->thresholdB) / g->mapNodeCost[it->first];
                     // heap.heapify(mapNodeIdx[it->first]);
                 }
             }

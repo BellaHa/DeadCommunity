@@ -107,9 +107,8 @@ double GIA::getDeterministicSolutionMig(vector<int> *sol) {
 #pragma omp critical
                 {
                     for (map<int, double>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
-                        double re = (((double) it->second) / dcrSet[i]->getThreshold());
-                        marginalGain[mapNodeIdx[it->first]] -= re;
-                        marginalGainB[mapNodeIdx[it->first]] -= re / g->mapNodeCost[it->first];
+                        marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
+                        marginalGainB[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->thresholdB) / g->mapNodeCost[it->first];
                         heap.heapify(mapNodeIdx[it->first]);
                     }
                 }

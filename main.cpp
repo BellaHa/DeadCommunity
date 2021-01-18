@@ -54,7 +54,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     gia1.getSolutionMig(&sol, &reGIA1);
     sw.stop();
     double timeGIA1 = sw.getSeconds();
-    double costGIA1 = gia.calculateCostMig(sol);
+    double costGIA1 = gia1.calculateCostMig(sol);
     cout << "GIA: " << reGIA1 << endl;
     cout << "GIA Cost: " << costGIA1 << endl;
     cout << "GIA Time: " << timeGIA1 << endl << endl;
@@ -82,7 +82,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     hd1.getSolutionMig(&sol, &reHD1);
     sw.stop();
     double timeHD1 = sw.getSeconds();
-    double costHD1 = hd.calculateCost(sol);
+    double costHD1 = hd1.calculateCostMig(sol);
     cout << "HD: " << reHD1 << endl;
     cout << "HD Cost: " << costHD1 << endl;
     cout << "HD Time: " << timeHD1 << endl << endl;

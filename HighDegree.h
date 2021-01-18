@@ -30,6 +30,7 @@ public:
     void generateDCRgraphs(int number);
 
     void initiate();
+    vector<double> currentLiveB; // store current live node in each dcr graph after each iteration in greedy
 
 private:
     double getMarginalGain(int nodeId, vector<int> *sol);
