@@ -32,33 +32,33 @@ void printResult(bool isScalable, bool isLargeFile) {
     sol.clear();
     StopWatch sw;
 
-    cout << "GIA..." << endl;
-    GIA gia(g);
-    double reGIA = 0;
-    sw.start();
-    // if (Constant::GCS)
-    //     gia.getSolutionMig(&sol, &reGIA);
-    // else
-        gia.getSolution(&sol, &reGIA);
-    sw.stop();
-    double timeGIA = sw.getSeconds();
-    double costGIA = gia.calculateCost(sol);
-    cout << "GIA: " << reGIA << endl;
-    cout << "GIA Cost: " << costGIA << endl;
-    cout << "GIA Time: " << timeGIA << endl << endl;
-
-    cout << "GIA..." << endl;
-    GIA gia1(g);
-    double reGIA1 = 0;
-    sw.start();
-    gia1.getSolutionMig(&sol, &reGIA1);
-    sw.stop();
-    double timeGIA1 = sw.getSeconds();
-    double costGIA1 = gia1.calculateCostMig(sol);
-    cout << "GIA: " << reGIA1 << endl;
-    cout << "GIA Cost: " << costGIA1 << endl;
-    cout << "GIA Time: " << timeGIA1 << endl << endl;
-    return;
+    // cout << "GIA1..." << endl;
+    // GIA gia1(g);
+    // double reGIA1 = 0;
+    // sw.start();
+    // gia1.getSolutionMig(&sol, &reGIA1);
+    // sw.stop();
+    // double timeGIA1 = sw.getSeconds();
+    // double costGIA1 = gia1.calculateCostMig(sol);
+    // cout << "GIA1: " << reGIA1 << endl;
+    // cout << "GIA1 Cost: " << costGIA1 << endl;
+    // cout << "GIA1 Time: " << timeGIA1 << endl << endl;
+    //
+    // cout << "GIA..." << endl;
+    // GIA gia(g);
+    // double reGIA = 0;
+    // sw.start();
+    // // if (Constant::GCS)
+    // //     gia.getSolutionMig(&sol, &reGIA);
+    // // else
+    //     gia.getSolution(&sol, &reGIA);
+    // sw.stop();
+    // double timeGIA = sw.getSeconds();
+    // double costGIA = gia.calculateCost(sol);
+    // cout << "GIA: " << reGIA << endl;
+    // cout << "GIA Cost: " << costGIA << endl;
+    // cout << "GIA Time: " << timeGIA << endl << endl;
+    // return;
 
     cout << "HD..." << endl;
     HighDegree hd(g);

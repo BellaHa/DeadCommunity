@@ -193,6 +193,27 @@ void Algorithm::initiate() {
     }
 }
 
+void Algorithm::initiateMig() {
+    double epsilon = Constant::EPSILON;
+    double delta = Constant::DELTA;
+    int n = g->getNumberOfNodes();
+    int kMax = n / 2;
+    double lognCk = Common::getInstance()->lognCk(n, kMax);
+    nMax = (2. + (2. / 3.) * epsilon) * ((double) n / pow(epsilon, 2)) * ((log(2) + lognCk) - log(delta));
+    n1 = (2. + (2. / 3.) * epsilon) * (1. / pow(epsilon, 2)) * log(1. / delta);
+    iMax = ceil(log2(nMax / n1));
+    delta1 = delta / (2. * iMax);
+    c = log(1. / delta1);
+
+    vector<int> *nodeIds = g->getListNodeIds();
+    indx = vector<int>(nodeIds->size(), 0);
+    for (int i = 0; i < nodeIds->size(); i++) {
+        int u = (*nodeIds)[i];
+        indx[i] = i;
+        mapNodeIdx.insert(pair<int, int>(u, i));
+    }
+}
+
 void Algorithm::generateDCRgraphs(int number) {
 #pragma omp parallel for
     for (int i = 0; i < number; i++) {

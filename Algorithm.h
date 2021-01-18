@@ -27,18 +27,26 @@ public:
     virtual double getSolution2Step(vector<int> *sol, double *est);
 
     virtual double estimateInf(vector<int> *sol);
+
     double estimateInfMig(vector<int> *sol);
 
     virtual void generateDCRgraphs(int number);
 
     void generateDCRgraphsMig(int number);
 
-    virtual void initiate();
+    void initiate();
+
+    void initiateMig();
 
     double calculateCost(vector<int> sol);
+
     double calculateCostMig(vector<int> sol);
 
     map<int, double> intialGainB; // initial fraction inf of each nodes, USED in sandwich solution
+    double nMax;
+    double n1;
+    int iMax;
+    double delta1;
     double c;
 
 protected:

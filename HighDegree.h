@@ -4,12 +4,6 @@
 
 class HighDegree : public Algorithm {
 public:
-    double nMax;
-    double n1;
-    int iMax;
-    double delta1;
-    double c;
-
     HighDegree(SocialGraph *g);
 
     ~HighDegree();
@@ -29,7 +23,6 @@ public:
 
     void generateDCRgraphs(int number);
 
-    void initiate();
     vector<double> currentLiveB; // store current live node in each dcr graph after each iteration in greedy
 
 private:

@@ -103,12 +103,12 @@ double GIA::getDeterministicSolutionMig(vector<int> *sol) {
                 map<int, double> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNodeMig((*nodeIds)[maxInd],
                                                                                                      &(currentLive[i]),
                                                                                                      &(currentLiveB[i]));
-
 #pragma omp critical
                 {
                     for (map<int, double>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
-                        marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
-                        marginalGainB[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->thresholdB) / g->mapNodeCost[it->first];
+                        double re = ((double) it->second) / dcrSet[i]->thresholdB;
+                        marginalGain[mapNodeIdx[it->first]] -= re;
+                        marginalGainB[mapNodeIdx[it->first]] -= re / g->mapNodeCost[it->first];
                         heap.heapify(mapNodeIdx[it->first]);
                     }
                 }
@@ -185,7 +185,7 @@ double GIA::estimateInf(vector<int>* sol, int noDcr) {
 
 double GIA::getSolution(vector<int> *sol, double *est) {
     sol->clear();
-    initiate();
+    initiateMig();
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphs((int) n1);
     double epsilon = Constant::EPSILON;
@@ -228,7 +228,7 @@ double GIA::getSolution(vector<int> *sol, double *est) {
 
 double GIA::getSolutionMig(vector<int> *sol, double *est) {
     sol->clear();
-    initiate();
+    initiateMig();
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphsMig((int) n1);
     double epsilon = Constant::EPSILON;
@@ -336,28 +336,6 @@ void GIA::generateDCRgraphs(int number) {
         //cout << i << endl;
     }
     //cout << "done generating samples" << endl;
-}
-
-
-void GIA::initiate() {
-    double epsilon = Constant::EPSILON;
-    double delta = Constant::DELTA;
-    int n = g->getNumberOfNodes();
-    int kMax = n / 2;
-    double lognCk = Common::getInstance()->lognCk(n, kMax);
-    nMax = (2. + (2. / 3.) * epsilon) * ((double) n / pow(epsilon, 2)) * ((log(2) + lognCk) - log(delta));
-    n1 = (2. + (2. / 3.) * epsilon) * (1. / pow(epsilon, 2)) * log(1. / delta);
-    iMax = ceil(log2(nMax / n1));
-    delta1 = delta / (2. * iMax);
-    c = log(1. / delta);
-
-    vector<int> *nodeIds = g->getListNodeIds();
-    indx = vector<int>(nodeIds->size(), 0);
-    for (int i = 0; i < nodeIds->size(); i++) {
-        int u = (*nodeIds)[i];
-        indx[i] = i;
-        mapNodeIdx.insert(pair<int, int>(u, i));
-    }
 }
 
 double GIA::estimateInf(vector<int> *sol) {

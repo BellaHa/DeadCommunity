@@ -4,11 +4,6 @@
 
 class GIA : public Algorithm {
 public:
-    double nMax;
-    double n1;
-    int iMax;
-    double delta1;
-
     GIA(SocialGraph *g);
 
     ~GIA();
@@ -28,10 +23,7 @@ public:
 
     double estimateInf(vector<int> *sol);
 
-
     void generateDCRgraphs(int number);
-
-    void initiate();
 
     vector<double> currentLiveB; // store current live node in each dcr graph after each iteration in greedy
 

@@ -21,6 +21,7 @@ double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
     vector<double> marginalGainB(nodeIds->size(), 0);
 
     currentLive.clear();
+    currentLiveB.clear();
     for (int i = 0; i < dcrSet.size(); i++) {
         DCRgraph *dcr = dcrSet[i];
         vector<int> *commNodeIds = dcr->getCommunityNodeIds();
@@ -56,8 +57,9 @@ double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
 #pragma omp critical
             {
                 for (map<int, double>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
-                    marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
-                    marginalGainB[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->thresholdB) / g->mapNodeCost[it->first];
+                    double re = ((double) it->second) / dcrSet[i]->thresholdB;
+                    marginalGain[mapNodeIdx[it->first]] -= re;
+                    marginalGainB[mapNodeIdx[it->first]] -= re / g->mapNodeCost[it->first];
                     // heap.heapify(mapNodeIdx[it->first]);
                 }
             }
@@ -67,6 +69,7 @@ double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
 
     return gain * (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) / dcrSet.size();
 }
+
 /*Test for speed up greedy*/
 double HighDegree::getDeterministicSolution(vector<int> *sol) {
     sol->clear();
@@ -184,7 +187,7 @@ double HighDegree::estimateInf(vector<int>* sol, int noDcr) {
 
 double HighDegree::getSolution(vector<int> *sol, double *est) {
     sol->clear();
-    initiate();
+    initiateMig();
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphs((int) n1);
 
@@ -227,7 +230,7 @@ double HighDegree::getSolution(vector<int> *sol, double *est) {
 
 double HighDegree::getSolutionMig(vector<int> *sol, double *est) {
     sol->clear();
-    initiate();
+    initiateMig();
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphsMig((int) n1);
     double epsilon = Constant::EPSILON;
@@ -335,27 +338,6 @@ void HighDegree::generateDCRgraphs(int number) {
         //cout << i << endl;
     }
     //cout << "done generating samples" << endl;
-}
-
-void HighDegree::initiate() {
-    double epsilon = Constant::EPSILON;
-    double delta = Constant::DELTA;
-    int n = g->getNumberOfNodes();
-    int kMax = n / 2;
-    double lognCk = Common::getInstance()->lognCk(n, kMax);
-    nMax = (2. + (2. / 3.) * epsilon) * ((double) n / pow(epsilon, 2)) * ((log(2) + lognCk) - log(delta));
-    n1 = (2. + (2. / 3.) * epsilon) * (1. / pow(epsilon, 2)) * log(1. / delta);
-    iMax = ceil(log2(nMax / n1));
-    delta1 = delta / (2. * iMax);
-    c = log(1. / delta);
-
-    vector<int> *nodeIds = g->getListNodeIds();
-    indx = vector<int>(nodeIds->size(), 0);
-    for (int i = 0; i < nodeIds->size(); i++) {
-        int u = (*nodeIds)[i];
-        indx[i] = i;
-        mapNodeIdx.insert(pair<int, int>(u, i));
-    }
 }
 
 double HighDegree::estimateInf(vector<int> *sol) {
