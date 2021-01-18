@@ -1,6 +1,7 @@
 #include "DCRgenerator.h"
 #include "Constant.h"
 #include <algorithm>
+#include <iostream>
 
 
 DCRgenerator::DCRgenerator() {
@@ -264,11 +265,129 @@ DCRgraph *DCRgenerator::generateDCRgraphICMig() {
     // return dcr;
 }
 
+DCRgraph *DCRgenerator::generateDCRgraphICMigB() {
+    int commId = g->randomSelectCommunity();
+    vector<int> *nodeIds = g->getNodesOfCommunity(commId);
+    int threshold = Constant::IS_BOUNDED_THRESHOLD ? 2 : (int) (Constant::PERCENTAGE_THRESHOLD * nodeIds->size());
+    double commBenefit = g->mapCommBenefit[commId];
+    double thresholdB =(int) (Constant::PERCENTAGE_THRESHOLD * commBenefit);
+    thresholdB = thresholdB > 0 ? thresholdB : 1;
+    // cout << threshold << endl;
+    // cout << thresholdB << endl;
+    DCRgraph *dcr = new DCRgraph(g, commId, threshold > 0 ? threshold : 1, commBenefit, thresholdB, nodeIds);
+    map<int, vector<int>> mapNeighbors;
+    map<int, map<int, bool>> st;
+    // map<int, bool> ck;
+
+    for (int i = 0; i < nodeIds->size(); ++i) {
+        int nodeId = nodeIds->at(i);
+        vector<int> reachable{nodeId};
+        vector<int> queue;
+        queue.emplace_back(nodeId);
+        map<int, bool> ck;
+        ck[nodeId] = true;
+        while (!queue.empty()) {
+            int u = queue.at(0);
+            queue.erase(queue.begin());
+            vector<pair<int, double>> *incommingNeighbors = g->getIncommingNeighbors(u);
+            if (incommingNeighbors != nullptr && incommingNeighbors->size() > 0) {
+                for (int j = 0; j < incommingNeighbors->size(); ++j) {
+                    pair<int, double> tmp = incommingNeighbors->at(j);
+                    int v = tmp.first;
+                    double w = tmp.second;
+                    map<int, bool> *mapP = &(st[u]);
+
+                    if (mapP->find(v) == mapP->end()) {
+                        double coin = ((double) (commonInstance->randomInThread() % 1000)) / 1000;
+                        (*mapP)[v] = (coin <= w);
+                    }
+
+                    if ((*mapP)[v] && ck.find(v) == ck.end()) {
+                        queue.push_back(v);
+                        ck[v] = true;
+                        reachable.push_back(v);
+                    }
+                }
+            }
+        }
+        dcr->addReachable(nodeId, &reachable);
+    }
+    return dcr;
+
+    // vector<int> queue;
+    // for (int i = 0; i < nodeIds->size(); i++) {
+    //     queue.push_back(nodeIds->at(i));
+    //     ck[nodeIds->at(i)] = true;
+    // }
+    //
+    // while (!queue.empty()) {
+    //     int u = queue[0];
+    //     queue.erase(queue.begin());
+    //     vector<pair<int, double>> *incommingNeighbors = g->getIncommingNeighbors(u);
+    //     if (incommingNeighbors != nullptr && incommingNeighbors->size() > 0) {
+    //         for (int i = 0; i < incommingNeighbors->size(); i++) {
+    //             pair<int, double> tmp = incommingNeighbors->at(i);
+    //             int v = tmp.first;
+    //             double w = tmp.second;
+    //
+    //             map<int, bool> *mapP = &(st[u]);
+    //
+    //             if (mapP->find(v) == mapP->end()) {
+    //                 double coin = ((double) (commonInstance->randomInThread() % 1000)) / 1000;
+    //                 (*mapP)[v] = (coin <= w);
+    //             }
+    //
+    //             if ((*mapP)[v] && (ck.find(v) == ck.end())) {
+    //                 queue.push_back(v);
+    //                 ck[v] = true;
+    //                 mapNeighbors[u].push_back(v);
+    //             }
+    //         }
+    //     }
+    //
+    // }
+    //
+    // // reverse dfs to get reachable set
+    // for (int i = 0; i < nodeIds->size(); i++) {
+    //     int nodeId = nodeIds->at(i);
+    //     vector<int> reachable;
+    //
+    //     map<int, bool> ck;
+    //     vector<int> queue;
+    //     queue.push_back(nodeId);
+    //     ck[nodeId] = true;
+    //     while (!queue.empty()) {
+    //         int u = queue[0];
+    //         queue.erase(queue.begin());
+    //         reachable.push_back(u);
+    //         vector<int> p = mapNeighbors[u];
+    //         for (int j = 0; j < p.size(); j++) {
+    //             if (ck.find(p[j]) == ck.end()) {
+    //                 queue.push_back(p[j]);
+    //                 ck[p[j]] = true;
+    //             }
+    //         }
+    //     }
+    //
+    //     //dfs(nodeId, &reachable, &mapNeighbors);
+    //     dcr->addReachable(nodeId, &reachable);
+    // }
+    //
+    // return dcr;
+}
+
 DCRgraph *DCRgenerator::generateDCRgraphMig() {
     if (Constant::MODEL)
         return generateDCRgraphLT();
     else
         return generateDCRgraphICMig();
+}
+
+DCRgraph *DCRgenerator::generateDCRgraphMigB() {
+    if (Constant::MODEL)
+        return generateDCRgraphLT();
+    else
+        return generateDCRgraphICMigB();
 }
 
 /*

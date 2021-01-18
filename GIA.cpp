@@ -64,6 +64,62 @@ double GIA::getDeterministicSolution(vector<int> *sol) {
     return gain * (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) / dcrSet.size();
 }
 
+double GIA::getDeterministicSolutionMig(vector<int> *sol) {
+    sol->clear();
+    vector<int> *nodeIds = g->getListNodeIds();
+    vector<double> marginalGain(nodeIds->size(), 0);
+    vector<double> marginalGainB(nodeIds->size(), 0);
+
+    currentLive.clear();
+    currentLiveB.clear();
+    for (int i = 0; i < dcrSet.size(); i++) {
+        DCRgraph *dcr = dcrSet[i];
+        vector<int> *commNodeIds = dcr->getCommunityNodeIds();
+        currentLive.push_back(vector<int>(*commNodeIds));
+        currentLiveB.push_back(dcr->commBenefit);
+        dcr->initiateTrackGainMig();
+    }
+
+    //#pragma omp parallel for
+    for (int i = 0; i < nodeIds->size(); i++) {
+        int u = (*nodeIds)[i];
+        marginalGain[i] = intialGain[u];
+        marginalGainB[i] = intialGainB[u];
+    }
+
+    InfCost<double> hd(&marginalGainB[0]);
+    MappedHeap<InfCost<double>> heap(indx, hd);
+
+    double gain = 0.0;
+    while (gain / dcrSet.size() < 1) {
+        unsigned int maxInd = heap.pop();
+        double maxGain = marginalGain[maxInd];
+        gain += maxGain;
+        if (maxGain > 0) {
+            sol->push_back((*nodeIds)[maxInd]);
+            // update current live
+#pragma omp parallel for
+            for (int i = 0; i < dcrSet.size(); i++) {
+                map<int, double> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNodeMig((*nodeIds)[maxInd],
+                                                                                                     &(currentLive[i]),
+                                                                                                     &(currentLiveB[i]));
+
+#pragma omp critical
+                {
+                    for (map<int, double>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
+                        double re = (((double) it->second) / dcrSet[i]->getThreshold());
+                        marginalGain[mapNodeIdx[it->first]] -= re;
+                        marginalGainB[mapNodeIdx[it->first]] -= re / g->mapNodeCost[it->first];
+                        heap.heapify(mapNodeIdx[it->first]);
+                    }
+                }
+            }
+        } else break;
+    }
+
+    return gain * (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) / dcrSet.size();
+}
+
 /*official running*/
 // double GIA::getDeterministicSolution(vector<int> *sol) {
 //     sol->clear();
@@ -171,6 +227,49 @@ double GIA::getSolution(vector<int> *sol, double *est) {
     // return (*est) / re;
 }
 
+double GIA::getSolutionMig(vector<int> *sol, double *est) {
+    sol->clear();
+    initiate();
+    omp_set_num_threads(Constant::NUM_THREAD);
+    generateDCRgraphsMig((int) n1);
+    double epsilon = Constant::EPSILON;
+    double K = (double) g->getNumberOfCommunities();
+
+    double re = 0.;
+    for (int i = 0; i < iMax; ++i) {
+        re = getDeterministicSolutionMig(sol);
+        *est = estimateInfMig(sol);
+        if (*est >= (K - epsilon * K) || i == iMax - 1) {
+            break;
+        } else {
+            generateDCRgraphsMig(dcrSet.size());
+        }
+    }
+    clearMig();
+    return *est / re;
+
+    // while (dcrSet.size() < rMax) {
+    //     double re = getDeterministicSolution(sol);
+    //     int tmp = dcrSet.size();
+    //     *est = estimateInf(sol);
+    //     if (dcrSet.size() * (*est) / (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) >=
+    //         D) {
+    //         double re2 = estimate(sol, e2, Constant::DELTA / 3, dcrSet.size());
+    //         cout << re << " " << re2 << " " << time(NULL) << endl;
+    //         if (re <= (1 + e1) * re2)
+    //             return (*est) / re;
+    //     }
+    //
+    //     int tmp2 = dcrSet.size();
+    //     generateDCRgraphs(2 * tmp - tmp2);
+    //
+    // }
+    // double re = getDeterministicSolution(sol);
+    // *est = estimateInf(sol);
+    // clear();
+    // return (*est) / re;
+}
+
 double GIA::getSolution2Step(vector<int> *sol, double *est) {
     sol->clear();
     initiate();
@@ -240,6 +339,7 @@ void GIA::generateDCRgraphs(int number) {
     //cout << "done generating samples" << endl;
 }
 
+
 void GIA::initiate() {
     double epsilon = Constant::EPSILON;
     double delta = Constant::DELTA;
@@ -270,6 +370,29 @@ double GIA::estimateInf(vector<int> *sol) {
 #pragma omp parallel for
     for (int i = 0; i < dcrSet.size(); i++) {
         bool kill = dcrSet[i]->isKill(sol);
+
+        if (kill) {
+#pragma omp critical
+            {
+                Xsol += 1.0;
+            }
+        }
+    }
+
+    double eSigma = (K / T) * Xsol;
+    double nb2 = K + (K / T) * ((2. * c / 3) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
+    return min(nb1, nb2);
+}
+
+double GIA::estimateInfMig(vector<int> *sol) {
+    double K = (double) g->getNumberOfCommunities();
+    double T = (double) dcrSet.size();
+    double nb1 = K - ((K * c) / (3. * T));
+
+    double Xsol = 0.;
+#pragma omp parallel for
+    for (int i = 0; i < dcrSet.size(); i++) {
+        bool kill = dcrSet[i]->isKillMig(sol);
 
         if (kill) {
 #pragma omp critical

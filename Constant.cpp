@@ -15,3 +15,4 @@ const double Constant::DELTA = 0.2;
 const int Constant::NUM_THREAD = 4;
 bool Constant::IS_BOUNDED_THRESHOLD = false;
 const bool Constant::MODEL = false; // true : LT ; false : IC
+const bool Constant::GCS = false;

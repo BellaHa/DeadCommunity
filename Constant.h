@@ -15,4 +15,5 @@ public:
     static const int NUM_THREAD;
     static bool IS_BOUNDED_THRESHOLD;
     static const bool MODEL; // true : LT ; false : IC
+    static const bool GCS;
 };

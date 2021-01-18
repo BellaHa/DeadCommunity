@@ -558,6 +558,11 @@ void SocialGraph::addCommunity(vector<int> *commNodes) {
         hMax = (int) commNodes->size() * Constant::PERCENTAGE_THRESHOLD;
     if (bMin > commNodes->size())
         bMin = commNodes->size();
+    double commBenefit = 0.;
+    for (int i = 0; i < commNodes->size(); ++i) {
+        commBenefit += mapNodeBenefit[commNodes->at(i)];
+    }
+    mapCommBenefit[listCommListNodeIds.size() - 1] = commBenefit;
 }
 
 void SocialGraph::generateEdgeWeightBinFile(string file, string outfile, string binfile) {
@@ -736,10 +741,10 @@ void SocialGraph::readSocialGraphBin(string file, bool isDirected) {
         // reads costs
         vector<double> nodeCosts(noOfNodes);
         inputFile.read((char *) &nodeCosts[0], noOfNodes * sizeof(double));
-        // if (arg.nc == 0) {
-        //     nodeCosts.clear();
-        //     nodeCosts.resize(noOfNodes, 1);
-        // }
+        if (!Constant::GCS) {
+            nodeCosts.clear();
+            nodeCosts.resize(noOfNodes, 1);
+        }
         for (int i = 0; i < noOfNodes; ++i) {
             mapNodeCost[listNodeIds[i]] = nodeCosts[i];
         }
@@ -750,10 +755,10 @@ void SocialGraph::readSocialGraphBin(string file, bool isDirected) {
         // reads benefits
         vector<double> nodeBenefits(noOfNodes);
         inputFile.read((char *) &nodeBenefits[0], noOfNodes * sizeof(double));
-        // if (arg.rb == 0) {
-        //     nodeBenefits.clear();
-        //     nodeBenefits.resize(noOfNodes, 1);
-        // }
+        if (!Constant::GCS) {
+            nodeBenefits.clear();
+            nodeBenefits.resize(noOfNodes, 1);
+        }
         for (int i = 0; i < noOfNodes; ++i) {
             mapNodeBenefit[listNodeIds[i]] = nodeBenefits[i];
         }

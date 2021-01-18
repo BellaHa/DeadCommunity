@@ -187,11 +187,35 @@ void Algorithm::generateDCRgraphs(int number) {
     //cout << "done generating samples" << endl;
 }
 
+void Algorithm::generateDCRgraphsMig(int number) {
+#pragma omp parallel for
+    for (int i = 0; i < number; i++) {
+        DCRgraph *dcr = gen.generateDCRgraphMigB();
+#pragma omp critical
+        {
+            dcrSet.push_back(dcr);
+            if (!isMaf)
+                dcr->updateInitalGainMig(&intialGain, &intialGainB, &initialDead);
+            else
+                dcr->updateInitalGainMig(&intialGain, &intialGainB, &initialDead, &initialOtherCommunityGain);
+        }
+        //cout << i << endl;
+    }
+    //cout << "done generating samples" << endl;
+}
 void Algorithm::clear() {
     for (int i = 0; i < dcrSet.size(); i++)
         delete dcrSet[i];
     dcrSet.clear();
     intialGain.clear();
+}
+
+void Algorithm::clearMig() {
+    for (int i = 0; i < dcrSet.size(); i++)
+        delete dcrSet[i];
+    dcrSet.clear();
+    intialGain.clear();
+    intialGainB.clear();
 }
 
 double Algorithm::calculateCost(vector<int> sol) {

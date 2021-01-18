@@ -65,6 +65,7 @@ public:
     map<int, double> mapNodeBenefit;
     map<int, vector<int>> mapIncomingNodes;
     map<int, vector<int>> mapOutgoingNodes;
+    map<int, double> mapCommBenefit;
 
 private:
     vector<int> listNodeIds;

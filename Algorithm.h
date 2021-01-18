@@ -30,8 +30,13 @@ public:
 
     virtual void generateDCRgraphs(int number);
 
+    void generateDCRgraphsMig(int number);
+
     virtual void initiate();
+
     double calculateCost(vector<int> sol);
+
+    map<int, double> intialGainB; // initial fraction inf of each nodes, USED in sandwich solution
 
 protected:
     SocialGraph *g;
@@ -49,6 +54,8 @@ protected:
     int rMax; // maximum number of ri graph
 
     void clear();
+
+    void clearMig();
 
     bool isMaf = false;
 };

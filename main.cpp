@@ -36,25 +36,44 @@ void printResult(bool isScalable, bool isLargeFile) {
     GIA gia(g);
     double reGIA = 0;
     sw.start();
-    gia.getSolution(&sol, &reGIA);
+    // if (Constant::GCS)
+    //     gia.getSolutionMig(&sol, &reGIA);
+    // else
+        gia.getSolution(&sol, &reGIA);
     sw.stop();
     double timeGIA = sw.getSeconds();
     double costGIA = gia.calculateCost(sol);
     cout << "GIA: " << reGIA << endl;
     cout << "GIA Cost: " << costGIA << endl;
-    cout << "GIA Time: " << timeGIA << endl;
+    cout << "GIA Time: " << timeGIA << endl << endl;
 
-    cout << "HD..." << endl;
-    HighDegree hd(g);
-    double reHD = 0;
+    cout << "GIA..." << endl;
+    GIA gia1(g);
+    double reGIA1 = 0;
     sw.start();
-    hd.getSolution(&sol, &reHD);
+    gia1.getSolutionMig(&sol, &reGIA1);
     sw.stop();
-    double timeHD = sw.getSeconds();
-    double costHD = hd.calculateCost(sol);
-    cout << "HD: " << reHD << endl;
-    cout << "HD Cost: " << costHD << endl;
-    cout << "HD Time: " << timeHD << endl;
+    double timeGIA1 = sw.getSeconds();
+    double costGIA1 = gia.calculateCost(sol);
+    cout << "GIA: " << reGIA1 << endl;
+    cout << "GIA Cost: " << costGIA1 << endl;
+    cout << "GIA Time: " << timeGIA1 << endl << endl;
+
+    // cout << "HD..." << endl;
+    // HighDegree hd(g);
+    // double reHD = 0;
+    // sw.start();
+    // if (Constant::GCS)
+    //     hd.getSolutionMig(&sol, &reHD);
+    // else
+    //     hd.getSolution(&sol, &reHD);
+    // sw.stop();
+    // double timeHD = sw.getSeconds();
+    // double costHD = hd.calculateCost(sol);
+    // cout << "HD: " << reHD << endl;
+    // cout << "HD Cost: " << costHD << endl;
+    // cout << "HD Time: " << timeHD << endl << endl;
+    return;
 
     cout << "MAF..." << endl;
     GreedySolution maf(g);
@@ -66,7 +85,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     double costMaf = maf.calculateCost(sol);
     cout << "MAF: " << remaf << endl;
     cout << "MAF Cost: " << costMaf << endl;
-    cout << "MAF Time: " << timeMaf << endl;
+    cout << "MAF Time: " << timeMaf << endl << endl;
 
     cout << "UBG..." << endl;
     SandwichSolution ubg(g);
@@ -78,7 +97,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     double costUbg = ubg.calculateCost(sol);
     cout << "UBG: " << reubg << endl;
     cout << "UBG Cost: " << costUbg << endl;
-    cout << "UBG Time: " << timeUbg << endl;
+    cout << "UBG Time: " << timeUbg << endl << endl;
 
     cout << "DSSA..." << endl;
     SSA ssa(g);
@@ -91,14 +110,14 @@ void printResult(bool isScalable, bool isLargeFile) {
     double costSSA = ssa.calculateCost(sol);
     cout << "DSSA: " << reSSA << endl;
     cout << "DSSA Cost: " << costSSA << endl;
-    cout << "DSSA Time: " << timeSSA << endl;
+    cout << "DSSA Time: " << timeSSA << endl << endl;
 
-    writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
-              << "," << reGIA << "," << costGIA << "," << timeGIA
-              << "," << reHD << "," << costHD << "," << timeHD
-              << "," << remaf << "," << costMaf << "," << timeMaf
-              << "," << reubg << "," << costUbg << "," << timeUbg
-              << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
+    // writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
+    //           << "," << reGIA << "," << costGIA << "," << timeGIA
+    //           << "," << reHD << "," << costHD << "," << timeHD
+    //           << "," << remaf << "," << costMaf << "," << timeMaf
+    //           << "," << reubg << "," << costUbg << "," << timeUbg
+    //           << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
 
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);

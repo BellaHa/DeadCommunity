@@ -8,6 +8,16 @@ DCRgraph::DCRgraph(int communityId, int threshold, vector<int> *communityNodeIds
     this->communityNodeIds = communityNodeIds;
 }
 
+DCRgraph::DCRgraph(SocialGraph *g, int communityId, int threshold, double commBenefit, double thresholdB,
+                   vector<int> *communityNodeIds) {
+    this->communityId = communityId;
+    this->threshold = threshold;
+    this->communityNodeIds = communityNodeIds;
+    this->g = g;
+    this->commBenefit = commBenefit;
+    this->thresholdB = thresholdB;
+}
+
 DCRgraph::~DCRgraph() {
 
 }
@@ -185,6 +195,78 @@ map<int, int> DCRgraph::updateGainAndCurrentLiveAfterAddingNode(int nodeId, vect
     return re;
 }
 
+map<int, double>
+DCRgraph::updateGainAndCurrentLiveAfterAddingNodeMig(int nodeId, vector<int> *currentLive, double *currentLiveB) {
+    map<int, double> re;
+    if (currentLive->empty()) return re;
+    if (*currentLiveB <= 0) return re;
+
+    if (mapTouch.find(nodeId) != mapTouch.end()) {
+        vector<int> touch = mapTouch[nodeId];
+        for (int i = currentLive->size() - 1; i >= 0; i--) {
+            int nodeId = currentLive->at(i);
+            if (find(touch.begin(), touch.end(), nodeId) != touch.end()) {
+                currentLive->erase(currentLive->begin() + i);
+                vector<int> reachable = mapReachable[nodeId];
+
+                double nodeBenefit = g->mapNodeBenefit[nodeId];
+                *currentLiveB -= nodeBenefit;
+
+                // for (int j = 0; j < reachable.size(); j++) {
+                //     int tmp = reachable[j];
+                //     // re[tmp]++;
+                //     trackGain[tmp]--;
+                // }
+
+                for (int j = 0; j < reachable.size(); j++) {
+                    int tmp = reachable[j];
+                    re[tmp] += nodeBenefit;
+                    trackGainB[tmp] -= nodeBenefit;
+                }
+
+                if (currentLive->size() <= communityNodeIds->size() - threshold ||
+                    *currentLiveB <= commBenefit - thresholdB) {
+                    // reduce gain of all other node that touch remaining node of community in this dcr graph
+                    for (map<int, double>::iterator it = trackGainB.begin(); it != trackGainB.end(); ++it) {
+                        re[it->first] += it->second;
+                    }
+                    currentLive->clear();
+                    *currentLiveB = 0;
+                    return re;
+                }
+
+                // if (*currentLiveB <= commBenefit - thresholdB) {
+                //     // reduce gain of all other node that touch remaining node of community in this dcr graph
+                //     for (map<int, double>::iterator it = trackGainB.begin(); it != trackGainB.end(); ++it) {
+                //         re[it->first] += it->second;
+                //     }
+                //     currentLive->clear();
+                //     *currentLiveB = 0;
+                //     return re;
+                // }
+            }
+        }
+
+        // int toInf = currentLive->size() - communityNodeIds->size() + threshold;
+        // for (map<int, int>::iterator it = trackGain.begin(); it != trackGain.end(); ++it) {
+        //     if (it->second > toInf) {
+        //         // re[it->first] += (it->second - toInf);
+        //         trackGain[it->first] = toInf;
+        //     }
+        // }
+
+        double toInfB = *currentLiveB - commBenefit + thresholdB;
+        for (map<int, double>::iterator it = trackGainB.begin(); it != trackGainB.end(); ++it) {
+            if (it->second > toInfB) {
+                re[it->first] += (it->second - toInfB);
+                trackGainB[it->first] = toInfB;
+            }
+        }
+    }
+
+    return re;
+}
+
 map<int, bool>
 DCRgraph::updateGainAndCurrentLiveAfterAddingNodeCG(int nodeId, vector<int> *currentLive, vector<int> *canKill) {
     map<int, bool> re;
@@ -252,6 +334,35 @@ void DCRgraph::updateInitalGain(map<int, double> *gain, map<int, int> *mapDead, 
     }
 }
 
+void DCRgraph::updateInitalGainMig(map<int, double> *gain, map<int, double> *gainB, map<int, int> *mapDead,
+                                   map<int, double> *mapInfMaf) {
+    keyNode.clear();
+    for (map<int, vector<int>>::iterator it = mapTouch.begin(); it != mapTouch.end(); ++it) {
+        int nodeId = it->first;
+        vector<int> touchNodes = it->second;
+        int touch = it->second.size();
+        double touchB = 0.;
+        for (int i = 0; i < touch; ++i) {
+            touchB += g->mapNodeBenefit[touchNodes[i]];
+        }
+        double tmpB = touchB > thresholdB ? thresholdB : touchB;
+        tmpB /= thresholdB;
+        (*gain)[nodeId] += tmpB;
+        (*gainB)[nodeId] += tmpB / g->mapNodeCost[nodeId];
+
+        if ((touch >= threshold || touchB >= thresholdB) && mapDead != nullptr) {
+            (*mapDead)[nodeId]++;
+        }
+
+        if (mapInfMaf != nullptr && mapReachable.find(nodeId) == mapReachable.end()) {
+            (*mapInfMaf)[nodeId] += tmpB;
+        }
+
+        if (touch >= threshold || touchB >= thresholdB)
+            keyNode.push_back(nodeId);
+    }
+}
+
 bool DCRgraph::isKill(vector<int> *sol) {
     vector<int> kill;
     for (int i = 0; i < sol->size(); i++) {
@@ -262,6 +373,27 @@ bool DCRgraph::isKill(vector<int> *sol) {
                 if (find(kill.begin(), kill.end(), tmp[j]) == kill.end()) {
                     kill.push_back(tmp[j]);
                     if (kill.size() >= threshold)
+                        return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool DCRgraph::isKillMig(vector<int> *sol) {
+    vector<int> kill;
+    double killB = 0.;
+    for (int i = 0; i < sol->size(); i++) {
+        int nodeId = (*sol)[i];
+        if (mapTouch.find(nodeId) != mapTouch.end()) {
+            vector<int> tmp = mapTouch[nodeId];
+            for (int j = 0; j < tmp.size(); j++) {
+                if (find(kill.begin(), kill.end(), tmp[j]) == kill.end()) {
+                    kill.push_back(tmp[j]);
+                    killB += g->mapNodeBenefit[tmp[j]];
+                    if (killB >= thresholdB)
+                        // if (kill.size() >= threshold)
                         return true;
                 }
             }
@@ -318,6 +450,21 @@ void DCRgraph::initiateTrackGain() {
         int tmp = it->second.size();
         tmp = tmp < threshold ? tmp : threshold;
         trackGain[it->first] = tmp;
+    }
+}
+
+void DCRgraph::initiateTrackGainMig() {
+    for (map<int, vector<int>>::iterator it = mapTouch.begin(); it != mapTouch.end(); ++it) {
+        vector<int> touchNodes = it->second;
+        int tmp = it->second.size();
+        double tmpB = 0.;
+        for (int i = 0; i < touchNodes.size(); ++i) {
+            tmpB += g->mapNodeBenefit[touchNodes[i]];
+        }
+        tmp = tmp < threshold ? tmp : threshold;
+        tmpB = tmpB < thresholdB ? tmpB : thresholdB;
+        trackGain[it->first] = tmp;
+        trackGainB[it->first] = tmpB;
     }
 }
 

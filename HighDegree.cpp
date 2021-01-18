@@ -13,6 +13,55 @@ HighDegree::HighDegree(SocialGraph *g) : Algorithm(g) {
 HighDegree::~HighDegree() {
 }
 
+double HighDegree::getDeterministicSolutionMig(vector<int> *sol) {
+    sol->clear();
+    vector<int> *nodeIds = g->getListNodeIds();
+    vector<double> marginalGain(nodeIds->size(), 0);
+    vector<int> oDegree(nodeIds->size(), 0);
+
+    currentLive.clear();
+    for (int i = 0; i < dcrSet.size(); i++) {
+        DCRgraph *dcr = dcrSet[i];
+        vector<int> *commNodeIds = dcr->getCommunityNodeIds();
+        currentLive.push_back(vector<int>(*commNodeIds));
+        dcr->initiateTrackGain();
+    }
+
+    //#pragma omp parallel for
+    for (int i = 0; i < nodeIds->size(); i++) {
+        int u = (*nodeIds)[i];
+        marginalGain[i] = intialGain[u];
+        oDegree[i] = g->outgoingDegree.at(i);
+    }
+
+    InfCost<int> hd(&oDegree[0]);
+    MappedHeap<InfCost<int>> heap(indx, hd);
+
+    double gain = 0.0;
+    while (gain / dcrSet.size() < 1) {
+        unsigned int maxInd = heap.pop();
+        double maxGain = marginalGain[maxInd];
+        gain += maxGain;
+        // if (maxGain > 0) {
+        sol->push_back((*nodeIds)[maxInd]);
+        // update current live
+#pragma omp parallel for
+        for (int i = 0; i < dcrSet.size(); i++) {
+            map<int, int> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNode((*nodeIds)[maxInd],
+                                                                                           &(currentLive[i]));
+#pragma omp critical
+            {
+                for (map<int, int>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
+                    marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
+                    // heap.heapify(mapNodeIdx[it->first]);
+                }
+            }
+        }
+        // } else break;
+    }
+
+    return gain * (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) / dcrSet.size();
+}
 /*Test for speed up greedy*/
 double HighDegree::getDeterministicSolution(vector<int> *sol) {
     sol->clear();
@@ -140,6 +189,49 @@ double HighDegree::getSolution(vector<int> *sol, double *est) {
         *est = estimateInf(sol);
         double epsilon = Constant::EPSILON;
         double K = (double) g->getNumberOfCommunities();
+        if (*est >= (K - epsilon * K) || i == iMax - 1) {
+            break;
+        } else {
+            generateDCRgraphs(dcrSet.size());
+        }
+    }
+    clear();
+    return *est / re;
+
+    // while (dcrSet.size() < rMax) {
+    //     double re = getDeterministicSolution(sol);
+    //     int tmp = dcrSet.size();
+    //     *est = estimateInf(sol);
+    //     if (dcrSet.size() * (*est) / (Constant::IS_WEIGHTED ? g->getNumberOfNodes() : g->getNumberOfCommunities()) >=
+    //         D) {
+    //         double re2 = estimate(sol, e2, Constant::DELTA / 3, dcrSet.size());
+    //         cout << re << " " << re2 << " " << time(NULL) << endl;
+    //         if (re <= (1 + e1) * re2)
+    //             return (*est) / re;
+    //     }
+    //
+    //     int tmp2 = dcrSet.size();
+    //     generateDCRgraphs(2 * tmp - tmp2);
+    //
+    // }
+    // double re = getDeterministicSolution(sol);
+    // *est = estimateInf(sol);
+    // clear();
+    // return (*est) / re;
+}
+
+double HighDegree::getSolutionMig(vector<int> *sol, double *est) {
+    sol->clear();
+    initiate();
+    omp_set_num_threads(Constant::NUM_THREAD);
+    generateDCRgraphsMig((int) n1);
+    double epsilon = Constant::EPSILON;
+    double K = (double) g->getNumberOfCommunities();
+
+    double re = 0.;
+    for (int i = 0; i < iMax; ++i) {
+        re = getDeterministicSolution(sol);
+        *est = estimateInf(sol);
         if (*est >= (K - epsilon * K) || i == iMax - 1) {
             break;
         } else {
