@@ -270,7 +270,7 @@ DCRgraph *DCRgenerator::generateDCRgraphICMigB() {
     vector<int> *nodeIds = g->getNodesOfCommunity(commId);
     int threshold = Constant::IS_BOUNDED_THRESHOLD ? 2 : (int) (Constant::PERCENTAGE_THRESHOLD * nodeIds->size());
     double commBenefit = g->mapCommBenefit[commId];
-    double thresholdB = Constant::PERCENTAGE_THRESHOLD * commBenefit;
+    double thresholdB = (int) (Constant::PERCENTAGE_THRESHOLD * commBenefit);
     thresholdB = thresholdB > 0 ? thresholdB : 1;
     // cout << threshold << endl;
     // cout << thresholdB << endl;

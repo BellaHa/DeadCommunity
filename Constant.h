@@ -16,4 +16,5 @@ public:
     static bool IS_BOUNDED_THRESHOLD;
     static const bool MODEL; // true : LT ; false : IC
     static const bool GCS;
+    static const double EIG_TIME;
 };

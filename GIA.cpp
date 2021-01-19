@@ -1,10 +1,4 @@
 #include "GIA.h"
-#include <omp.h>
-#include <iostream>
-#include <time.h>
-#include "mappedheap.hpp"
-#include "HeapData.hpp"
-
 
 GIA::GIA(SocialGraph *g) : Algorithm(g) {
 

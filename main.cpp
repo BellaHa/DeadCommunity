@@ -17,6 +17,7 @@
 #include "HighTouch.h"
 #include "HighBenefit.h"
 #include "Constant.h"
+#include "EIG.h"
 
 using namespace std;
 
@@ -32,9 +33,9 @@ void printResult(bool isScalable, bool isLargeFile) {
     sol.clear();
     StopWatch sw;
 
-    double reGIA, reHD, remaf, reubg, reSSA;
-    double timeGIA, timeHD, timeMaf, timeUbg, timeSSA;
-    double costGIA, costHD, costMaf, costUbg, costSSA;
+    double reGIA, reEIG, reEIG1, reHD, reMAF, reUBG, reSSA;
+    double timeGIA, timeEIG, timeEIG1, timeHD, timeMAF, timeUBG, timeSSA;
+    double costGIA, costEIG, costEIG1, costHD, costMAF, costUBG, costSSA;
 
     cout << "GIA..." << endl;
     GIA gia(g);
@@ -50,18 +51,34 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl << endl;
 
-    // cout << "GIA1..." << endl;
-    // GIA gia1(g);
-    // double reGIA1 = 0;
-    // sw.start();
-    // gia1.getSolutionMig(&sol, &reGIA1);
-    // sw.stop();
-    // double timeGIA1 = sw.getSeconds();
-    // double costGIA1 = gia1.calculateCostMig(sol);
-    // cout << "GIA1: " << reGIA1 << endl;
-    // cout << "GIA1 Cost: " << costGIA1 << endl;
-    // cout << "GIA1 Time: " << timeGIA1 << endl << endl;
-    // return;
+    cout << "EIG..." << endl;
+    EIG eig(g);
+    sw.start();
+    // if (Constant::GCS)
+    //     eig.getSolutionMig(&sol, &reEIG);
+    // else
+    eig.getSolution(&sol, &reEIG);
+    sw.stop();
+    timeEIG = sw.getSeconds();
+    costEIG = eig.calculateCost(sol);
+    cout << "EIG: " << reEIG << endl;
+    cout << "EIG Cost: " << costEIG << endl;
+    cout << "EIG Time: " << timeEIG << endl << endl;
+
+    cout << "EIG1..." << endl;
+    EIG eig1(g);
+    sw.start();
+    // if (Constant::GCS)
+    eig1.getSolutionMig(&sol, &reEIG1);
+    // else
+    //     eig1.getSolution(&sol, &reEIG1);
+    sw.stop();
+    timeEIG1 = sw.getSeconds();
+    costEIG1 = eig1.calculateCostMig(sol);
+    cout << "EIG1: " << reEIG1 << endl;
+    cout << "EIG1 Cost: " << costEIG1 << endl;
+    cout << "EIG1 Time: " << timeEIG1 << endl << endl;
+    return;
 
     cout << "HD..." << endl;
     HighDegree hd(g);
@@ -77,41 +94,28 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "HD Cost: " << costHD << endl;
     cout << "HD Time: " << timeHD << endl << endl;
 
-    // cout << "HD..." << endl;
-    // HighDegree hd1(g);
-    // double reHD1 = 0;
-    // sw.start();
-    // hd1.getSolutionMig(&sol, &reHD1);
-    // sw.stop();
-    // double timeHD1 = sw.getSeconds();
-    // double costHD1 = hd1.calculateCostMig(sol);
-    // cout << "HD: " << reHD1 << endl;
-    // cout << "HD Cost: " << costHD1 << endl;
-    // cout << "HD Time: " << timeHD1 << endl << endl;
-    // return;
-
     if (!Constant::GCS) {
         cout << "MAF..." << endl;
         GreedySolution maf(g);
         sw.start();
-        maf.getSolutionBS(&sol, &remaf, 1, g->getNumberOfNodes());
+        maf.getSolutionBS(&sol, &reMAF, 1, g->getNumberOfNodes());
         sw.stop();
-        timeMaf = sw.getSeconds();
-        costMaf = maf.calculateCost(sol);
-        cout << "MAF: " << remaf << endl;
-        cout << "MAF Cost: " << costMaf << endl;
-        cout << "MAF Time: " << timeMaf << endl << endl;
+        timeMAF = sw.getSeconds();
+        costMAF = maf.calculateCost(sol);
+        cout << "MAF: " << reMAF << endl;
+        cout << "MAF Cost: " << costMAF << endl;
+        cout << "MAF Time: " << timeMAF << endl << endl;
 
         cout << "UBG..." << endl;
         SandwichSolution ubg(g);
         sw.start();
-        ubg.getSolutionFastBS(&sol, &reubg, 1, g->getNumberOfNodes());
+        ubg.getSolutionFastBS(&sol, &reUBG, 1, g->getNumberOfNodes());
         sw.stop();
-        timeUbg = sw.getSeconds();
-        costUbg = ubg.calculateCost(sol);
-        cout << "UBG: " << reubg << endl;
-        cout << "UBG Cost: " << costUbg << endl;
-        cout << "UBG Time: " << timeUbg << endl << endl;
+        timeUBG = sw.getSeconds();
+        costUBG = ubg.calculateCost(sol);
+        cout << "UBG: " << reUBG << endl;
+        cout << "UBG Cost: " << costUBG << endl;
+        cout << "UBG Time: " << timeUBG << endl << endl;
 
         cout << "DSSA..." << endl;
         SSA ssa(g);
@@ -130,8 +134,8 @@ void printResult(bool isScalable, bool isLargeFile) {
               << "," << reGIA << "," << costGIA << "," << timeGIA
               << "," << reHD << "," << costHD << "," << timeHD;
     if (!Constant::GCS) {
-        writefile << "," << remaf << "," << costMaf << "," << timeMaf
-                  << "," << reubg << "," << costUbg << "," << timeUbg
+        writefile << "," << reMAF << "," << costMAF << "," << timeMAF
+                  << "," << reUBG << "," << costUBG << "," << timeUBG
                   << "," << reSSA << "," << costSSA << "," << timeSSA;
     }
     writefile << endl;
@@ -172,6 +176,7 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
     Constant::IS_BOUNDED_THRESHOLD = isBoundedThres;
     Constant::IS_WEIGHTED = isWeighted;
     Constant::COMMUNITY_POPULATION = 8;
+
     if (!isDirected) {
         if (!isLargeFile)
             g->readSocialGraphFromFile("../data/" + input);
@@ -182,6 +187,7 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         g->readSocialGraphBin("../data/" + input);
         g->readCommunityFile("../data/" + inputCommunity, isCommMM);
     }
+
     string outfilename = "../results/" + input + "_result_"
                          + (Constant::GCS ? "gcs_" : "ucs_")
                          + ".csv";
@@ -198,6 +204,7 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
     }
     rIn.close();
     writefile.open(outfilename, ofstream::out | ofstream::app);
+
     if (writefile.is_open()) {
         // if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
         //     writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t bt \t hb \t ssa" << endl;

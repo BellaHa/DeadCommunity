@@ -1,5 +1,10 @@
 #pragma once
 
+#include <omp.h>
+#include <iostream>
+#include <time.h>
+#include "mappedheap.hpp"
+#include "HeapData.hpp"
 #include "Algorithm.h"
 
 class GIA : public Algorithm {
