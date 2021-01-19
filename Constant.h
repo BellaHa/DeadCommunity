@@ -17,4 +17,5 @@ public:
     static const bool MODEL; // true : LT ; false : IC
     static const bool GCS;
     static const double EIG_TIME;
+    static  int NUMBER_OF_COMMS;
 };

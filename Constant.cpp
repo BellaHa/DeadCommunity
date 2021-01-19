@@ -17,3 +17,4 @@ bool Constant::IS_BOUNDED_THRESHOLD = false;
 const bool Constant::MODEL = false; // true : LT ; false : IC
 const bool Constant::GCS = false;
 const double Constant::EIG_TIME = 10800;
+int Constant::NUMBER_OF_COMMS = 10;

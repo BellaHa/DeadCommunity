@@ -78,6 +78,7 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "HD: " << reHD << endl;
     cout << "HD Cost: " << costHD << endl;
     cout << "HD Time: " << timeHD << endl << endl;
+    // return;
 
     if (!Constant::GCS) {
         cout << "MAF..." << endl;
@@ -203,14 +204,16 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         if (changeK) {
             if (!isDirected)
                 g->formCommunitiesFromActualCommunities();
-            for (Constant::K = min; Constant::K <= max; Constant::K += step) {
+            for (Constant::K = min; Constant::K <= 20; Constant::K += step) {
                 printResult(isScalable, isLargeFile);
             }
         } else {
             // for (Constant::COMMUNITY_POPULATION = min;
             //      Constant::COMMUNITY_POPULATION <= max; Constant::COMMUNITY_POPULATION += step) {
-            g->formCommunitiesFromActualCommunities();
-            printResult(isScalable, isLargeFile);
+            for (Constant::NUMBER_OF_COMMS = min; Constant::NUMBER_OF_COMMS <= max; Constant::NUMBER_OF_COMMS += step) {
+                g->formCommunitiesFromActualCommunities();
+                printResult(isScalable, isLargeFile);
+            }
             // }
         }
         writefile.close();
@@ -222,6 +225,9 @@ int main() {
     omp_set_num_threads(Constant::NUM_THREAD);
 
     vector<string> graphs{"facebook"};
+    vector<int> min{10, 100, 200, 500, 1000};
+    vector<int> max{90, 900, 2000, 5000, 10000};
+    vector<int> step{10, 100, 200, 500, 1000};
     // vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
     for (int i = 0; i < graphs.size(); ++i) {
         string graph = graphs[i];
@@ -230,7 +236,7 @@ int main() {
         // string inputTxt = graph + "E.txt";
         string inputBin = graph + ".bin";
         string inputCommunity = graph + "Comm.txt";
-        runExperiment(inputBin, inputCommunity, 4, 10, 2, true, false, false, false, true, false);
+        runExperiment(inputBin, inputCommunity, min[i], max[i], step[i], true, false, false, false, true, false);
     }
 
     // Generation

@@ -448,12 +448,14 @@ void SocialGraph::formCommunitiesFromActualCommunities() {
     bMin = 10000;
     vector<int> commNodes;
     int commId = 0;
+    int numberOfComms = Constant::NUMBER_OF_COMMS - 1;
     for (int i = 0; i < actualCommNodeIds.size(); i++) {
         if (actualCommNodeIds[i].size() <= Constant::COMMUNITY_POPULATION) {
             addCommunity(&actualCommNodeIds[i]);
             for (int j = 0; j < actualCommNodeIds[i].size(); j++)
                 mapNodeId2CommId[actualCommNodeIds[i][j]] = commId;
             commId++;
+            if (commId > numberOfComms) break;
         } else {
             commNodes.clear();
             for (int j = 0; j < actualCommNodeIds[i].size(); j++) {
@@ -464,12 +466,15 @@ void SocialGraph::formCommunitiesFromActualCommunities() {
                     addCommunity(&commNodes);
                     commNodes.clear();
                     commId++;
+                    if (commId > numberOfComms) break;
                 }
             }
+            if (commId > numberOfComms) break;
             if (!commNodes.empty()) {
                 addCommunity(&commNodes);
                 commNodes.clear();
                 commId++;
+                if (commId > numberOfComms) break;
             }
         }
     }
