@@ -32,6 +32,24 @@ void printResult(bool isScalable, bool isLargeFile) {
     sol.clear();
     StopWatch sw;
 
+    double reGIA, reHD, remaf, reubg, reSSA;
+    double timeGIA, timeHD, timeMaf, timeUbg, timeSSA;
+    double costGIA, costHD, costMaf, costUbg, costSSA;
+
+    cout << "GIA..." << endl;
+    GIA gia(g);
+    sw.start();
+    if (Constant::GCS)
+        gia.getSolutionMig(&sol, &reGIA);
+    else
+        gia.getSolution(&sol, &reGIA);
+    sw.stop();
+    timeGIA = sw.getSeconds();
+    costGIA = gia.calculateCost(sol);
+    cout << "GIA: " << reGIA << endl;
+    cout << "GIA Cost: " << costGIA << endl;
+    cout << "GIA Time: " << timeGIA << endl << endl;
+
     // cout << "GIA1..." << endl;
     // GIA gia1(g);
     // double reGIA1 = 0;
@@ -43,94 +61,80 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "GIA1: " << reGIA1 << endl;
     // cout << "GIA1 Cost: " << costGIA1 << endl;
     // cout << "GIA1 Time: " << timeGIA1 << endl << endl;
-    //
-    // cout << "GIA..." << endl;
-    // GIA gia(g);
-    // double reGIA = 0;
-    // sw.start();
-    // // if (Constant::GCS)
-    // //     gia.getSolutionMig(&sol, &reGIA);
-    // // else
-    //     gia.getSolution(&sol, &reGIA);
-    // sw.stop();
-    // double timeGIA = sw.getSeconds();
-    // double costGIA = gia.calculateCost(sol);
-    // cout << "GIA: " << reGIA << endl;
-    // cout << "GIA Cost: " << costGIA << endl;
-    // cout << "GIA Time: " << timeGIA << endl << endl;
     // return;
 
     cout << "HD..." << endl;
     HighDegree hd(g);
-    double reHD = 0;
     sw.start();
-    // if (Constant::GCS)
-    //     hd.getSolutionMig(&sol, &reHD);
-    // else
-    hd.getSolution(&sol, &reHD);
+    if (Constant::GCS)
+        hd.getSolutionMig(&sol, &reHD);
+    else
+        hd.getSolution(&sol, &reHD);
     sw.stop();
-    double timeHD = sw.getSeconds();
-    double costHD = hd.calculateCost(sol);
+    timeHD = sw.getSeconds();
+    costHD = hd.calculateCost(sol);
     cout << "HD: " << reHD << endl;
     cout << "HD Cost: " << costHD << endl;
     cout << "HD Time: " << timeHD << endl << endl;
 
-    cout << "HD..." << endl;
-    HighDegree hd1(g);
-    double reHD1 = 0;
-    sw.start();
-    hd1.getSolutionMig(&sol, &reHD1);
-    sw.stop();
-    double timeHD1 = sw.getSeconds();
-    double costHD1 = hd1.calculateCostMig(sol);
-    cout << "HD: " << reHD1 << endl;
-    cout << "HD Cost: " << costHD1 << endl;
-    cout << "HD Time: " << timeHD1 << endl << endl;
-    return;
+    // cout << "HD..." << endl;
+    // HighDegree hd1(g);
+    // double reHD1 = 0;
+    // sw.start();
+    // hd1.getSolutionMig(&sol, &reHD1);
+    // sw.stop();
+    // double timeHD1 = sw.getSeconds();
+    // double costHD1 = hd1.calculateCostMig(sol);
+    // cout << "HD: " << reHD1 << endl;
+    // cout << "HD Cost: " << costHD1 << endl;
+    // cout << "HD Time: " << timeHD1 << endl << endl;
+    // return;
 
-    cout << "MAF..." << endl;
-    GreedySolution maf(g);
-    double remaf = 0;
-    sw.start();
-    maf.getSolutionBS(&sol, &remaf, 1, g->getNumberOfNodes());
-    sw.stop();
-    double timeMaf = sw.getSeconds();
-    double costMaf = maf.calculateCost(sol);
-    cout << "MAF: " << remaf << endl;
-    cout << "MAF Cost: " << costMaf << endl;
-    cout << "MAF Time: " << timeMaf << endl << endl;
+    if (!Constant::GCS) {
+        cout << "MAF..." << endl;
+        GreedySolution maf(g);
+        sw.start();
+        maf.getSolutionBS(&sol, &remaf, 1, g->getNumberOfNodes());
+        sw.stop();
+        timeMaf = sw.getSeconds();
+        costMaf = maf.calculateCost(sol);
+        cout << "MAF: " << remaf << endl;
+        cout << "MAF Cost: " << costMaf << endl;
+        cout << "MAF Time: " << timeMaf << endl << endl;
 
-    cout << "UBG..." << endl;
-    SandwichSolution ubg(g);
-    double reubg = 0;
-    sw.start();
-    ubg.getSolutionFastBS(&sol, &reubg, 1, g->getNumberOfNodes());
-    sw.stop();
-    double timeUbg = sw.getSeconds();
-    double costUbg = ubg.calculateCost(sol);
-    cout << "UBG: " << reubg << endl;
-    cout << "UBG Cost: " << costUbg << endl;
-    cout << "UBG Time: " << timeUbg << endl << endl;
+        cout << "UBG..." << endl;
+        SandwichSolution ubg(g);
+        sw.start();
+        ubg.getSolutionFastBS(&sol, &reubg, 1, g->getNumberOfNodes());
+        sw.stop();
+        timeUbg = sw.getSeconds();
+        costUbg = ubg.calculateCost(sol);
+        cout << "UBG: " << reubg << endl;
+        cout << "UBG Cost: " << costUbg << endl;
+        cout << "UBG Time: " << timeUbg << endl << endl;
 
-    cout << "DSSA..." << endl;
-    SSA ssa(g);
-    double reSSA = 0;
-    ssa.graphBinFile = graphBinFile;
-    ssa.seedFile = seedFile;
-    ssa.bsTime = 0;
-    ssa.getSolutionBS(&sol, &reSSA, 1, g->getNumberOfNodes());
-    double timeSSA = ssa.bsTime;
-    double costSSA = ssa.calculateCost(sol);
-    cout << "DSSA: " << reSSA << endl;
-    cout << "DSSA Cost: " << costSSA << endl;
-    cout << "DSSA Time: " << timeSSA << endl << endl;
+        cout << "DSSA..." << endl;
+        SSA ssa(g);
+        ssa.graphBinFile = graphBinFile;
+        ssa.seedFile = seedFile;
+        ssa.bsTime = 0;
+        ssa.getSolutionBS(&sol, &reSSA, 1, g->getNumberOfNodes());
+        timeSSA = ssa.bsTime;
+        costSSA = ssa.calculateCost(sol);
+        cout << "DSSA: " << reSSA << endl;
+        cout << "DSSA Cost: " << costSSA << endl;
+        cout << "DSSA Time: " << timeSSA << endl << endl;
+    }
 
-    // writefile << Constant::K << "," << Constant::COMMUNITY_POPULATION
-    //           << "," << reGIA << "," << costGIA << "," << timeGIA
-    //           << "," << reHD << "," << costHD << "," << timeHD
-    //           << "," << remaf << "," << costMaf << "," << timeMaf
-    //           << "," << reubg << "," << costUbg << "," << timeUbg
-    //           << "," << reSSA << "," << costSSA << "," << timeSSA << endl;
+    writefile << g->getNumberOfCommunities() << "," << Constant::COMMUNITY_POPULATION
+              << "," << reGIA << "," << costGIA << "," << timeGIA
+              << "," << reHD << "," << costHD << "," << timeHD;
+    if (!Constant::GCS) {
+        writefile << "," << remaf << "," << costMaf << "," << timeMaf
+                  << "," << reubg << "," << costUbg << "," << timeUbg
+                  << "," << reSSA << "," << costSSA << "," << timeSSA;
+    }
+    writefile << endl;
 
     // CompareGreedy grd(g);
     // long startGrd = time(NULL);
@@ -178,25 +182,32 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         g->readSocialGraphBin("../data/" + input);
         g->readCommunityFile("../data/" + inputCommunity, isCommMM);
     }
-
     string outfilename = "../results/" + input + "_result_"
-                         + (isScalable ? "scalable_" : "2step_")
-                         + (Constant::IS_BOUNDED_THRESHOLD ? "boundedThres" : "freeThres")
-                         + (changeK ? "_changeK" : "_changePop")
-                         + (isWeighted ? "_weighted" : "_unweighted")
-                         + (isCommMM ? "_isMM" : "_isClauset") + ".csv";
-    writefile.open(outfilename);
+                         + (Constant::GCS ? "gcs_" : "ucs_")
+                         + ".csv";
+    ifstream rIn(outfilename);
+    if (rIn.peek() == EOF) {
+        rIn.close();
+        ofstream out(outfilename);
+        out << "k,Pop,gia,gia-cost,gia-time,"
+            << "hd,hd-cost,hd-time,"
+            << "maf,maf-cost,maf-time,"
+            << "ubg,ubg-cost,ubg-time,"
+            << "dssa,dssa-cost,dssa-time" << endl;
+        out.close();
+    }
+    rIn.close();
+    writefile.open(outfilename, ofstream::out | ofstream::app);
     if (writefile.is_open()) {
-        if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
-            writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t bt \t hb \t ssa" << endl;
-        else
-            writefile << "k,Pop,gia,gia-cost,gia-time,"
-                      << "hd,hd-cost,hd-time,"
-                      << "maf,maf-cost,maf-time,"
-                      << "ubg,ubg-cost,ubg-time,"
-                      << "dssa,dssa-cost,dssa-time" << endl;
+        // if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
+        //     writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t bt \t hb \t ssa" << endl;
+        // else
+        //     writefile << "k,Pop,gia,gia-cost,gia-time,"
+        //               << "hd,hd-cost,hd-time,"
+        //               << "maf,maf-cost,maf-time,"
+        //               << "ubg,ubg-cost,ubg-time,"
+        //               << "dssa,dssa-cost,dssa-time" << endl;
         // writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t hb \t ssa" << endl;
-
         if (changeK) {
             if (!isDirected)
                 g->formCommunitiesFromActualCommunities();
@@ -210,7 +221,6 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
             printResult(isScalable, isLargeFile);
             // }
         }
-
         writefile.close();
     }
 }
