@@ -33,9 +33,9 @@ void printResult(bool isScalable, bool isLargeFile) {
     sol.clear();
     StopWatch sw;
 
-    double reGIA, reEIG, reEIG1, reHD, reMAF, reUBG, reSSA;
-    double timeGIA, timeEIG, timeEIG1, timeHD, timeMAF, timeUBG, timeSSA;
-    double costGIA, costEIG, costEIG1, costHD, costMAF, costUBG, costSSA;
+    double reGIA, reEIG, reHD, reMAF, reUBG, reSSA;
+    double timeGIA, timeEIG, timeHD, timeMAF, timeUBG, timeSSA;
+    double costGIA, costEIG, costHD, costMAF, costUBG, costSSA;
 
     cout << "GIA..." << endl;
     GIA gia(g);
@@ -54,31 +54,16 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "EIG..." << endl;
     EIG eig(g);
     sw.start();
-    // if (Constant::GCS)
-    //     eig.getSolutionMig(&sol, &reEIG);
-    // else
-    eig.getSolution(&sol, &reEIG);
+    if (Constant::GCS)
+        eig.getSolutionMig(&sol, &reEIG);
+    else
+        eig.getSolution(&sol, &reEIG);
     sw.stop();
     timeEIG = sw.getSeconds();
     costEIG = eig.calculateCost(sol);
     cout << "EIG: " << reEIG << endl;
     cout << "EIG Cost: " << costEIG << endl;
     cout << "EIG Time: " << timeEIG << endl << endl;
-
-    cout << "EIG1..." << endl;
-    EIG eig1(g);
-    sw.start();
-    // if (Constant::GCS)
-    eig1.getSolutionMig(&sol, &reEIG1);
-    // else
-    //     eig1.getSolution(&sol, &reEIG1);
-    sw.stop();
-    timeEIG1 = sw.getSeconds();
-    costEIG1 = eig1.calculateCostMig(sol);
-    cout << "EIG1: " << reEIG1 << endl;
-    cout << "EIG1 Cost: " << costEIG1 << endl;
-    cout << "EIG1 Time: " << timeEIG1 << endl << endl;
-    return;
 
     cout << "HD..." << endl;
     HighDegree hd(g);
