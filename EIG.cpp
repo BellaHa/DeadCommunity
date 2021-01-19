@@ -35,9 +35,9 @@ double EIG::getDeterministicSolution(vector<int> *sol) {
                 for (int k = 0; k < reachable.size(); ++k) {
                     reachableSeed += x[mapNodeIdx[reachable[k]]];
                 }
-                // model.add(IloIfThen(env, reachableSeed >= 1, y[j] == 1));
-                // model.add(IloIfThen(env, reachableSeed < 1, y[j] == 0));
-                model.add(reachableSeed >= y[j]);
+                model.add(IloIfThen(env, reachableSeed >= 1, y[j] == 1));
+                model.add(IloIfThen(env, reachableSeed < 1, y[j] == 0));
+                // model.add(reachableSeed >= y[j]);
                 deadNodes += y[j];
                 reachableSeed.end();
             }

@@ -51,19 +51,19 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl << endl;
 
-    cout << "EIG..." << endl;
-    EIG eig(g);
-    sw.start();
-    if (Constant::GCS)
-        eig.getSolutionMig(&sol, &reEIG);
-    else
-        eig.getSolution(&sol, &reEIG);
-    sw.stop();
-    timeEIG = sw.getSeconds();
-    costEIG = eig.calculateCost(sol);
-    cout << "EIG: " << reEIG << endl;
-    cout << "EIG Cost: " << costEIG << endl;
-    cout << "EIG Time: " << timeEIG << endl << endl;
+    // cout << "EIG..." << endl;
+    // EIG eig(g);
+    // sw.start();
+    // if (Constant::GCS)
+    //     eig.getSolutionMig(&sol, &reEIG);
+    // else
+    //     eig.getSolution(&sol, &reEIG);
+    // sw.stop();
+    // timeEIG = sw.getSeconds();
+    // costEIG = eig.calculateCost(sol);
+    // cout << "EIG: " << reEIG << endl;
+    // cout << "EIG Cost: " << costEIG << endl;
+    // cout << "EIG Time: " << timeEIG << endl << endl;
 
     cout << "HD..." << endl;
     HighDegree hd(g);
@@ -118,6 +118,7 @@ void printResult(bool isScalable, bool isLargeFile) {
 
     writefile << g->getNumberOfCommunities() << "," << Constant::COMMUNITY_POPULATION
               << "," << reGIA << "," << costGIA << "," << timeGIA
+              << "," << reEIG << "," << costEIG << "," << timeEIG
               << "," << reHD << "," << costHD << "," << timeHD;
     if (!Constant::GCS) {
         writefile << "," << reMAF << "," << costMAF << "," << timeMAF
@@ -182,6 +183,7 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
         rIn.close();
         ofstream out(outfilename);
         out << "k,Pop,gia,gia-cost,gia-time,"
+            << "eig,eig-cost,eig-time,"
             << "hd,hd-cost,hd-time,"
             << "maf,maf-cost,maf-time,"
             << "ubg,ubg-cost,ubg-time,"
@@ -224,10 +226,10 @@ int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
 
-    vector<string> graphs{"facebook"};
-    vector<int> min{10, 100, 200, 500, 1000};
-    vector<int> max{90, 900, 2000, 5000, 10000};
-    vector<int> step{10, 100, 200, 500, 1000};
+    vector<string> graphs{"wiki"};
+    vector<int> min{100, 100, 200, 500, 1000};
+    vector<int> max{100, 900, 2000, 5000, 10000};
+    vector<int> step{100, 100, 200, 500, 1000};
     // vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
     for (int i = 0; i < graphs.size(); ++i) {
         string graph = graphs[i];
