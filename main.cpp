@@ -64,34 +64,22 @@ void printResult(bool isScalable, bool isLargeFile) {
     // cout << "EIG: " << reEIG << endl;
     // cout << "EIG Cost: " << costEIG << endl;
     // cout << "EIG Time: " << timeEIG << endl << endl;
-
-    cout << "HD..." << endl;
-    HighDegree hd(g);
-    sw.start();
-    if (Constant::GCS)
-        hd.getSolutionMig(&sol, &reHD);
-    else
-        hd.getSolution(&sol, &reHD);
-    sw.stop();
-    timeHD = sw.getSeconds();
-    costHD = hd.calculateCost(sol);
-    cout << "HD: " << reHD << endl;
-    cout << "HD Cost: " << costHD << endl;
-    cout << "HD Time: " << timeHD << endl << endl;
-    // return;
+    //
+    // cout << "HD..." << endl;
+    // HighDegree hd(g);
+    // sw.start();
+    // if (Constant::GCS)
+    //     hd.getSolutionMig(&sol, &reHD);
+    // else
+    //     hd.getSolution(&sol, &reHD);
+    // sw.stop();
+    // timeHD = sw.getSeconds();
+    // costHD = hd.calculateCost(sol);
+    // cout << "HD: " << reHD << endl;
+    // cout << "HD Cost: " << costHD << endl;
+    // cout << "HD Time: " << timeHD << endl << endl;
 
     if (!Constant::GCS) {
-        cout << "MAF..." << endl;
-        GreedySolution maf(g);
-        sw.start();
-        maf.getSolutionBS(&sol, &reMAF, 1, g->getNumberOfNodes());
-        sw.stop();
-        timeMAF = sw.getSeconds();
-        costMAF = maf.calculateCost(sol);
-        cout << "MAF: " << reMAF << endl;
-        cout << "MAF Cost: " << costMAF << endl;
-        cout << "MAF Time: " << timeMAF << endl << endl;
-
         cout << "UBG..." << endl;
         SandwichSolution ubg(g);
         sw.start();
@@ -103,17 +91,28 @@ void printResult(bool isScalable, bool isLargeFile) {
         cout << "UBG Cost: " << costUBG << endl;
         cout << "UBG Time: " << timeUBG << endl << endl;
 
-        cout << "DSSA..." << endl;
-        SSA ssa(g);
-        ssa.graphBinFile = graphBinFile;
-        ssa.seedFile = seedFile;
-        ssa.bsTime = 0;
-        ssa.getSolutionBS(&sol, &reSSA, 1, g->getNumberOfNodes());
-        timeSSA = ssa.bsTime;
-        costSSA = ssa.calculateCost(sol);
-        cout << "DSSA: " << reSSA << endl;
-        cout << "DSSA Cost: " << costSSA << endl;
-        cout << "DSSA Time: " << timeSSA << endl << endl;
+        // cout << "MAF..." << endl;
+        // GreedySolution maf(g);
+        // sw.start();
+        // maf.getSolutionBS(&sol, &reMAF, 1, g->getNumberOfNodes());
+        // sw.stop();
+        // timeMAF = sw.getSeconds();
+        // costMAF = maf.calculateCost(sol);
+        // cout << "MAF: " << reMAF << endl;
+        // cout << "MAF Cost: " << costMAF << endl;
+        // cout << "MAF Time: " << timeMAF << endl << endl;
+        //
+        // cout << "DSSA..." << endl;
+        // SSA ssa(g);
+        // ssa.graphBinFile = graphBinFile;
+        // ssa.seedFile = seedFile;
+        // ssa.bsTime = 0;
+        // ssa.getSolutionBS(&sol, &reSSA, 1, g->getNumberOfNodes());
+        // timeSSA = ssa.bsTime;
+        // costSSA = ssa.calculateCost(sol);
+        // cout << "DSSA: " << reSSA << endl;
+        // cout << "DSSA Cost: " << costSSA << endl;
+        // cout << "DSSA Time: " << timeSSA << endl << endl;
     }
 
     writefile << g->getNumberOfCommunities() << "," << Constant::COMMUNITY_POPULATION
