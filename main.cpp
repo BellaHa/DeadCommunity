@@ -225,10 +225,10 @@ int main() {
     g = new SocialGraph();
     omp_set_num_threads(Constant::NUM_THREAD);
 
-    vector<string> graphs{"wiki"};
-    vector<int> min{100, 100, 200, 500, 1000};
-    vector<int> max{100, 900, 2000, 5000, 10000};
-    vector<int> step{100, 100, 200, 500, 1000};
+    vector<string> graphs{"facebook"};
+    vector<int> min{10, 100, 200, 500, 1000};
+    vector<int> max{10, 900, 2000, 5000, 10000};
+    vector<int> step{10, 100, 200, 500, 1000};
     // vector<string> graphs{"facebook", "wiki", "epinions", "dblp", "pokec"};
     for (int i = 0; i < graphs.size(); ++i) {
         string graph = graphs[i];

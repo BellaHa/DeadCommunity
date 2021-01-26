@@ -478,7 +478,6 @@ void SocialGraph::formCommunitiesFromActualCommunities() {
             }
         }
     }
-    cout << "pause" << endl;
 }
 
 int SocialGraph::randomSelectCommunity() {
