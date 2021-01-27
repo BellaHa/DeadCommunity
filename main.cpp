@@ -51,20 +51,20 @@ void printResult(bool isScalable, bool isLargeFile) {
     cout << "GIA Cost: " << costGIA << endl;
     cout << "GIA Time: " << timeGIA << endl << endl;
 
-    // cout << "EIG..." << endl;
-    // EIG eig(g);
-    // sw.start();
-    // if (Constant::GCS)
-    //     eig.getSolutionMig(&sol, &reEIG);
-    // else
-    //     eig.getSolution(&sol, &reEIG);
-    // sw.stop();
-    // timeEIG = sw.getSeconds();
-    // costEIG = eig.calculateCost(sol);
-    // cout << "EIG: " << reEIG << endl;
-    // cout << "EIG Cost: " << costEIG << endl;
-    // cout << "EIG Time: " << timeEIG << endl << endl;
-    //
+    cout << "EIG..." << endl;
+    EIG eig(g);
+    sw.start();
+    if (Constant::GCS)
+        eig.getSolutionMig(&sol, &reEIG);
+    else
+        eig.getSolution(&sol, &reEIG);
+    sw.stop();
+    timeEIG = sw.getSeconds();
+    costEIG = eig.calculateCost(sol);
+    cout << "EIG: " << reEIG << endl;
+    cout << "EIG Cost: " << costEIG << endl;
+    cout << "EIG Time: " << timeEIG << endl << endl;
+
     // cout << "HD..." << endl;
     // HighDegree hd(g);
     // sw.start();

@@ -30,6 +30,8 @@ public:
 
     vector<double> currentLiveB; // store current live node in each dcr graph after each iteration in greedy
 
+    void initiateMig();
+
 private:
     double getMarginalGain(int nodeId, vector<int> *sol);
 

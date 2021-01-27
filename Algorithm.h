@@ -36,7 +36,7 @@ public:
 
     void initiate();
 
-    void initiateMig();
+    virtual void initiateMig();
 
     double calculateCost(vector<int> sol);
 

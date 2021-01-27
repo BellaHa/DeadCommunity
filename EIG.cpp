@@ -377,3 +377,24 @@ double EIG::estimateInf(vector<int> *sol) {
     return min(nb1, nb2);
 }
 
+void EIG::initiateMig() {
+    double epsilon = Constant::EPSILON;
+    double delta = Constant::DELTA;
+    int n = g->getNumberOfNodes();
+    int kMax = n / 2;
+    double lognCk = Common::getInstance()->lognCk(n, kMax);
+    nMax = (2. + (2. / 3.) * epsilon) * ((double) n / pow(epsilon, 2)) * ((log(2) + lognCk) - log(delta));
+    n1 = (1. / (2. * epsilon * epsilon)) * log(1. / delta);
+    iMax = ceil(log2(nMax / n1));
+    delta1 = delta / (2. * iMax);
+    c = log(1. / delta1);
+
+    vector<int> *nodeIds = g->getListNodeIds();
+    indx = vector<int>(nodeIds->size(), 0);
+    for (int i = 0; i < nodeIds->size(); i++) {
+        int u = (*nodeIds)[i];
+        indx[i] = i;
+        mapNodeIdx.insert(pair<int, int>(u, i));
+    }
+}
+
