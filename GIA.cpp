@@ -189,7 +189,7 @@ double GIA::getSolution(vector<int> *sol, double *est) {
     for (int i = 0; i < iMax; ++i) {
         re = getDeterministicSolution(sol);
         *est = estimateInf(sol, delta1);
-        if (*est >= (K - epsilon * K) || i == iMax - 1) {
+        if (*est >= (1. - epsilon) * K || i == iMax - 1) {
             break;
         } else {
             generateDCRgraphs(dcrSet.size());
