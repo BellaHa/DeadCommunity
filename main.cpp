@@ -10,13 +10,6 @@
 #include "SSA.h"
 #include "GIA.h"
 #include "HighDegree.h"
-#include "StopWatch.h"
-#include "BoundedThres.h"
-#include "CompareGreedy.h"
-#include "HighInfluence.h"
-#include "HighTouch.h"
-#include "HighBenefit.h"
-#include "Constant.h"
 #include "EIG.h"
 
 using namespace std;
@@ -125,35 +118,6 @@ void printResult(bool isScalable, bool isLargeFile) {
                   << "," << reSSA << "," << costSSA << "," << timeSSA;
     }
     writefile << endl;
-
-    // CompareGreedy grd(g);
-    // long startGrd = time(NULL);
-    // double reGrd = 0;
-    // if (isScalable)
-    // grd.getSolution(&sol, &reGrd);
-    // else
-    // grd.getSolution2Step(&sol, &reGrd);
-    // long timeGrd = time(NULL) - startGrd;
-    //
-    // long timeBt = 0;
-    // double reBt = 0;
-    // if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile) {
-    //     BoundedThres bt(g);
-    //     long startBt = time(NULL);
-    //     reBt = 0;
-    //     if (isScalable)
-    //         bt.getSolution(&sol, &reBt);
-    //     else
-    //         bt.getSolution2Step(&sol, &reBt);
-    //     timeBt = time(NULL) - startBt;
-    // }
-    //
-    // HighBenefit hb(g);
-    // long startHB = time(NULL);
-    // double reHb = 0;
-    // hb.getSolution(&sol, &reHb);
-    // long timeHB = time(NULL) - startHB;
-    // cout << "HB: " << reHb << endl;
 }
 
 void runExperiment(string input, string inputCommunity, int min, int max, int step, bool isScalable = true,
@@ -193,15 +157,6 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
     writefile.open(outfilename, ofstream::out | ofstream::app);
 
     if (writefile.is_open()) {
-        // if (Constant::IS_BOUNDED_THRESHOLD && !isLargeFile)
-        //     writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t bt \t hb \t ssa" << endl;
-        // else
-        //     writefile << "k,Pop,gia,gia-cost,gia-time,"
-        //               << "hd,hd-cost,hd-time,"
-        //               << "maf,maf-cost,maf-time,"
-        //               << "ubg,ubg-cost,ubg-time,"
-        //               << "dssa,dssa-cost,dssa-time" << endl;
-        // writefile << "k \t Pop \t maf \t ubg-ratio \t grd \t hb \t ssa" << endl;
         if (changeK) {
             if (!isDirected)
                 g->formCommunitiesFromActualCommunities();
@@ -209,13 +164,10 @@ void runExperiment(string input, string inputCommunity, int min, int max, int st
                 printResult(isScalable, isLargeFile);
             }
         } else {
-            // for (Constant::COMMUNITY_POPULATION = min;
-            //      Constant::COMMUNITY_POPULATION <= max; Constant::COMMUNITY_POPULATION += step) {
             for (Constant::NUMBER_OF_COMMS = min; Constant::NUMBER_OF_COMMS <= max; Constant::NUMBER_OF_COMMS += step) {
                 g->formCommunitiesFromActualCommunities();
                 printResult(isScalable, isLargeFile);
             }
-            // }
         }
         writefile.close();
     }
