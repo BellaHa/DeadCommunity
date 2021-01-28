@@ -261,7 +261,7 @@ double GreedySolution::getSolutionBS(vector<int> *sol, double *est, int left, in
     getSolution(&sol1, &est1);
     cout << "K: " << Constant::K << endl;
     cout << "size: " << sol1.size() << endl;
-    est1 = Algorithm::estimate(&sol1, Constant::EPSILON, Constant::DELTA, 100000000);
+    // est1 = Algorithm::estimate(&sol1, Constant::EPSILON, Constant::DELTA, 100000000);
     cout << "est1: " << est1 << endl;
     cout << "ratio: " << est1 * 100. / g->getNumberOfCommunities() << endl;
     cout << "-----\n";

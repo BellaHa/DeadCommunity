@@ -35,8 +35,8 @@ double Algorithm::estimate(vector<int> *sol, double epsilon, double delta, int t
         b = true;
 #pragma omp parallel for
         for (int j = 0; j < countPerIterator; j++) {
-            DCRgraph *g = gen.generateDCRgraphMig();
-            // DCRgraph *g = gen.generateDCRgraph();
+            // DCRgraph *g = gen.generateDCRgraphMig();
+            DCRgraph *g = gen.generateDCRgraph();
             bool kill = g->isKill(sol);
 
 #pragma omp critical
