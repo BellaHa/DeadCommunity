@@ -210,12 +210,14 @@ double EIG::getSolution(vector<int> *sol, double *est) {
     double re = 0.;
     for (int i = 0; i < iMax; ++i) {
         re = getDeterministicSolution(sol);
-        *est = estimateInf(sol);
-        if (*est >= (K - epsilon * K) || i == iMax - 1) {
+        generateDCRgraphs(dcrSet.size());
+        *est = estimateInf(sol, delta1);
+        if (*est >= (1. - epsilon) * K || i == iMax - 1) {
             break;
-        } else {
-            generateDCRgraphs(dcrSet.size());
         }
+        // else {
+        //     generateDCRgraphs(dcrSet.size());
+        // }
     }
     clear();
     return *est / re;
@@ -291,7 +293,7 @@ double EIG::getSolution2Step(vector<int> *sol, double *est) {
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphs((int) rMax);
     double re = getDeterministicSolution(sol);
-    *est = estimateInf(sol);
+    *est = estimateInf(sol, delta1);
     clear();
     return (*est) / re;
 }
@@ -354,10 +356,10 @@ void EIG::generateDCRgraphs(int number) {
     //cout << "done generating samples" << endl;
 }
 
-double EIG::estimateInf(vector<int> *sol) {
+double EIG::estimateInf(vector<int> *sol, double delta) {
     double K = (double) g->getNumberOfCommunities();
     double T = (double) dcrSet.size();
-    double nb1 = K - ((K * c) / (3. * T));
+    double c = log(1 / delta);
 
     double Xsol = 0.;
 #pragma omp parallel for
@@ -373,7 +375,8 @@ double EIG::estimateInf(vector<int> *sol) {
     }
 
     double eSigma = (K / T) * Xsol;
-    double nb2 = K + (K / T) * ((2. * c / 3) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
+    double nb1 = eSigma - ((K * c) / (3. * T));
+    double nb2 = eSigma + (K / T) * ((2. * c / 3.) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
     return min(nb1, nb2);
 }
 
@@ -384,9 +387,11 @@ void EIG::initiateMig() {
     int kMax = n / 2;
     double lognCk = Common::getInstance()->lognCk(n, kMax);
     nMax = (2. + (2. / 3.) * epsilon) * ((double) n / pow(epsilon, 2)) * ((log(2) + lognCk) - log(delta));
-    n1 = (1. / (2. * epsilon * epsilon)) * log(1. / delta);
+    n1 = (1. / (epsilon * epsilon)) * log(1. / delta);
+    // n1 = (1. / (2. * epsilon * epsilon)) * log(1. / delta);
     iMax = ceil(log2(nMax / n1));
-    delta1 = delta / (2. * iMax);
+    delta1 = delta / (2. * (iMax - 1));
+    // delta1 = delta / (2. * iMax);
     c = log(1. / delta1);
 
     vector<int> *nodeIds = g->getListNodeIds();

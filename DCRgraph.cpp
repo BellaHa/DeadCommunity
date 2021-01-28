@@ -41,6 +41,10 @@ map<int, vector<int>> *DCRgraph::getMapReachable() {
     return &mapReachable;
 }
 
+map<int, vector<int>> *DCRgraph::getMapTouch() {
+    return &mapTouch;
+}
+
 int DCRgraph::getPopulation() {
     return communityNodeIds->size();
 }

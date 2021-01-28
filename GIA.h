@@ -26,7 +26,9 @@ public:
 
     double estimate(vector<int> *sol, double epsilon, double delta, int tMax);
 
-    double estimateInf(vector<int> *sol);
+    double estimateInf(vector<int> *sol, double delta);
+
+    double calculateESigma(vector<int> *sol);
 
     void generateDCRgraphs(int number);
 

@@ -19,6 +19,7 @@ public:
     void addReachable(int nodeId, vector<int> *reachNodeIds);
 
     map<int, vector<int> > *getMapReachable();
+    map<int, vector<int> > *getMapTouch();
 
     int getPopulation();
 

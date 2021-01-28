@@ -188,12 +188,55 @@ double GIA::getSolution(vector<int> *sol, double *est) {
     double re = 0.;
     for (int i = 0; i < iMax; ++i) {
         re = getDeterministicSolution(sol);
-        *est = estimateInf(sol);
+        *est = estimateInf(sol, delta1);
         if (*est >= (K - epsilon * K) || i == iMax - 1) {
             break;
         } else {
             generateDCRgraphs(dcrSet.size());
         }
+    }
+    vector<int> sol_;
+    vector<int> reachableNodes;
+    map<int, bool> isHas;
+    for (int i = 0; i < dcrSet.size(); ++i) {
+        DCRgraph *dcr = dcrSet.at(i);
+        map<int, vector<int>> *touches = dcr->getMapTouch();
+        for (auto &touch:*touches) {
+            if (!isHas[touch.first]) {
+                reachableNodes.emplace_back(touch.first);
+                isHas[touch.first] = true;
+            }
+        }
+    }
+    isHas.clear();
+    double eSigma = calculateESigma(&sol_);
+    double est_ = estimateInf(&sol_, Constant::DELTA);
+    while (reachableNodes.size() > 0 && est_ < (1. - epsilon) * K) {
+        double max = -1.;
+        double idx = -1;
+        double newESigma = 0.;
+#pragma omp parallel for
+        for (int i = 0; i < reachableNodes.size(); ++i) {
+            vector<int> sol_1(sol_.begin(), sol_.end());
+            sol_1.emplace_back(reachableNodes.at(i));
+            double eSigma_ = calculateESigma(&sol_1);
+#pragma omp critical
+            {
+                if (eSigma_ - eSigma > max) {
+                    max = eSigma_ - eSigma;
+                    newESigma = eSigma_;
+                    idx = i;
+                }
+            }
+        }
+        eSigma = newESigma;
+        sol_.emplace_back(reachableNodes.at(idx));
+        est_ = estimateInf(&sol_, Constant::DELTA);
+        reachableNodes.erase(reachableNodes.begin() + idx);
+    }
+    if (calculateCost(sol_) < calculateCost(*sol)) {
+        *sol = sol_;
+        *est = est_;
     }
     clear();
     return *est / re;
@@ -269,7 +312,7 @@ double GIA::getSolution2Step(vector<int> *sol, double *est) {
     omp_set_num_threads(Constant::NUM_THREAD);
     generateDCRgraphs((int) rMax);
     double re = getDeterministicSolution(sol);
-    *est = estimateInf(sol);
+    *est = estimateInf(sol, delta1);
     clear();
     return (*est) / re;
 }
@@ -332,26 +375,50 @@ void GIA::generateDCRgraphs(int number) {
     //cout << "done generating samples" << endl;
 }
 
-double GIA::estimateInf(vector<int> *sol) {
+double GIA::estimateInf(vector<int> *sol, double delta) {
     double K = (double) g->getNumberOfCommunities();
     double T = (double) dcrSet.size();
-    double nb1 = K - ((K * c) / (3. * T));
+    double c = log(1. / delta);
 
     double Xsol = 0.;
+    if (sol != nullptr) {
 #pragma omp parallel for
-    for (int i = 0; i < dcrSet.size(); i++) {
-        bool kill = dcrSet[i]->isKill(sol);
+        for (int i = 0; i < dcrSet.size(); i++) {
+            bool kill = dcrSet[i]->isKill(sol);
 
-        if (kill) {
+            if (kill) {
 #pragma omp critical
-            {
-                Xsol += 1.0;
+                {
+                    Xsol += 1.0;
+                }
             }
         }
     }
 
     double eSigma = (K / T) * Xsol;
-    double nb2 = K + (K / T) * ((2. * c / 3) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
+    double nb1 = eSigma - ((K * c) / (3. * T));
+    double nb2 = eSigma + (K / T) * ((2. * c / 3.) - sqrt((4. * c * c / 9.) + (2. * T * c * (eSigma / K))));
     return min(nb1, nb2);
+}
+
+double GIA::calculateESigma(vector<int> *sol) {
+    double K = (double) g->getNumberOfCommunities();
+    double T = (double) dcrSet.size();
+
+    double Xsol = 0.;
+    if (sol != nullptr) {
+#pragma omp parallel for
+        for (int i = 0; i < dcrSet.size(); i++) {
+            bool kill = dcrSet[i]->isKill(sol);
+
+            if (kill) {
+#pragma omp critical
+                {
+                    Xsol += 1.0;
+                }
+            }
+        }
+    }
+    return (K / T) * Xsol;
 }
 
