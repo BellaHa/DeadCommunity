@@ -28,7 +28,7 @@ public:
 
     double estimateInf(vector<int> *sol, double delta);
 
-    double calculateXsol(vector<int> *sol, map<int, vector<int>> *mapNodeKill);
+    double calculateXsol(vector<int> *sol);
 
     void generateDCRgraphs(int number);
 
