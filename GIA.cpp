@@ -272,9 +272,9 @@ double GIA::getSolution(vector<int> *sol, double *est) {
             vector<int> sol_1(sol_.begin(), sol_.end());
             sol_1.emplace_back(reachableNodes.at(i));
             double eSigma_ = calculateXsol(&sol_1);
-            if (eSigma_ > 0) {
-                cout << eSigma_ << endl;
-            }
+            // if (eSigma_ > 0) {
+            //     cout << eSigma_ << endl;
+            // }
 #pragma omp critical
             {
                 if (eSigma_ - eSigma > max) {
