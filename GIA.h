@@ -28,7 +28,7 @@ public:
 
     double estimateInf(vector<int> *sol, double delta);
 
-    double calculateESigma(vector<int> *sol);
+    double calculateXsol(vector<int> *sol, map<int, vector<int>> *mapNodeKill);
 
     void generateDCRgraphs(int number);
 
