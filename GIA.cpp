@@ -198,53 +198,52 @@ double GIA::getSolution(vector<int> *sol, double *est) {
     vector<int> sol_;
     vector<int> reachableNodes;
     map<int, bool> isHas;
-    vector<int> indx_;
+    // vector<int> indx_;
     for (int i = 0; i < dcrSet.size(); ++i) {
         DCRgraph *dcr = dcrSet.at(i);
         map<int, vector<int>> *touches = dcr->getMapTouch();
         for (auto &touch:*touches) {
             if (!isHas[touch.first]) {
                 reachableNodes.emplace_back(touch.first);
-                indx_.emplace_back(reachableNodes.size() - 1);
+                // indx_.emplace_back(reachableNodes.size() - 1);
                 isHas[touch.first] = true;
             }
         }
     }
     isHas.clear();
-    vector<double> eSigmas;
-    for (int i = 0; i < reachableNodes.size(); ++i) {
-        vector<int> node{reachableNodes.at(i)};
-        eSigmas.emplace_back(calculateESigma(&node));
-    }
-    InfCost<double> hd(&eSigmas[0]);
-    MappedHeap<InfCost<double>> heap(indx_, hd);
+    // vector<double> eSigmas;
+    // for (int i = 0; i < reachableNodes.size(); ++i) {
+    //     vector<int> node{reachableNodes.at(i)};
+    //     eSigmas.emplace_back(calculateESigma(&node));
+    // }
+    // InfCost<double> hd(&eSigmas[0]);
+    // MappedHeap<InfCost<double>> heap(indx_, hd);
 
     double est_ = estimateInf(&sol_, Constant::DELTA);
-    double gain = 0.;
-    while (est_ < (1. - epsilon) * K) {
-        unsigned int maxInd = heap.pop();
-        double maxGain = eSigmas[maxInd];
-        gain += maxGain;
-        if (maxGain > 0) {
-            sol_.emplace_back(reachableNodes.at(maxInd));
-            // update current live
-#pragma omp parallel for
-            for (int i = 0; i < dcrSet.size(); i++) {
-                map<int, int> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNode((*nodeIds)[maxInd],
-                                                                                               &(currentLive[i]));
-
-#pragma omp critical
-                {
-                    for (map<int, int>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
-                        marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
-                        heap.heapify(mapNodeIdx[it->first]);
-                    }
-                }
-
-            }
-        } else break;
-    }
-
+//     double gain = 0.;
+//     while (est_ < (1. - epsilon) * K) {
+//         unsigned int maxInd = heap.pop();
+//         double maxGain = eSigmas[maxInd];
+//         gain += maxGain;
+//         if (maxGain > 0) {
+//             sol_.emplace_back(reachableNodes.at(maxInd));
+//             // update current live
+// #pragma omp parallel for
+//             for (int i = 0; i < dcrSet.size(); i++) {
+//                 map<int, int> reducedGain = dcrSet[i]->updateGainAndCurrentLiveAfterAddingNode((*nodeIds)[maxInd],
+//                                                                                                &(currentLive[i]));
+//
+// #pragma omp critical
+//                 {
+//                     for (map<int, int>::iterator it = reducedGain.begin(); it != reducedGain.end(); ++it) {
+//                         marginalGain[mapNodeIdx[it->first]] -= (((double) it->second) / dcrSet[i]->getThreshold());
+//                         heap.heapify(mapNodeIdx[it->first]);
+//                     }
+//                 }
+//
+//             }
+//         } else break;
+//     }
 
     double eSigma = calculateESigma(&sol_);
     while (reachableNodes.size() > 0 && est_ < (1. - epsilon) * K) {
